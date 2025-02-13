@@ -1,7 +1,7 @@
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 
-// Lista de usuários mock
+
 const users = [
   {
     id: "1",
@@ -61,6 +61,7 @@ const handler = NextAuth({
   session: {
     strategy: 'jwt'
   },
+  secret: process.env.NEXTAUTH_SECRET,
   debug: process.env.NODE_ENV === 'development'
 });
 
