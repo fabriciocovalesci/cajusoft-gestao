@@ -2,7 +2,10 @@ import { NextResponse } from 'next/server';
 import { NextRequest } from 'next/server';
 
 export function middleware(request: NextRequest) {
-  const token = request.cookies.get('next-auth.session-token');
+  // Verifica tanto o cookie de desenvolvimento quanto o de produção
+  const token = request.cookies.get('next-auth.session-token') || 
+                request.cookies.get('__Secure-next-auth.session-token');
+                
   const isAuthenticated = !!token;
   const isPublicPath = request.nextUrl.pathname === '/login' || request.nextUrl.pathname === '/';
   const isProtectedPath = request.nextUrl.pathname.startsWith('/home') || 

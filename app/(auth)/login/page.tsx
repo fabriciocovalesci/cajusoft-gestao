@@ -48,6 +48,7 @@ export default function Login() {
         email: data.email,
         password: data.password,
         redirect: false,
+        callbackUrl: '/home'
       });
 
       if (result?.error) {
@@ -56,9 +57,13 @@ export default function Login() {
       }
 
       if (result?.ok) {
-        console.log('Login bem sucedido, redirecionando');
-        router.replace("/home");
-        toast.success("Login realizado com sucesso!");
+        console.log('Login bem sucedido, detalhes:', {
+          baseUrl: process.env.NEXT_PUBLIC_BASE_URL,
+          windowOrigin: window.location.origin,
+          result
+        });
+        const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || window.location.origin;
+        window.location.href = `${baseUrl}/home`;
       }
     } catch (error) {
       console.error("Erro no login:", error);
