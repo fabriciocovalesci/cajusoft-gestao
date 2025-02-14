@@ -7,8 +7,7 @@ import { FaUserCircle } from 'react-icons/fa';
 
 export function Navbar() {
   const { data: session, status } = useSession();
-
-  const homeLink = status === 'authenticated' ? '/home' : '/';
+  const isAuthenticated = status === 'authenticated';
 
   const handleSignOut = async () => {
     try {
@@ -22,24 +21,24 @@ export function Navbar() {
   };
 
   return (
-    <div className="navbar bg-base-100 shadow-md px-4 sm:px-8">
+    <div className="navbar bg-base-100 shadow-md px-4 sm:px-6 fixed top-0 left-0 right-0 z-50 h-14">
       <div className="flex-1">
-        <Link href={homeLink} className="flex items-center gap-3">
-          <div className="relative w-16 h-16">
+        <Link href={isAuthenticated ? '/home' : '/'} className="flex items-center gap-2">
+          <div className="relative w-10 h-10">
             <Image
               src="/logo-prefeitura.png"
               alt="Logo Prefeitura de Pacajus"
               fill
               style={{ objectFit: 'contain' }}
               priority
-              className="p-1.5"
+              className="p-1"
             />
           </div>
           <div className="flex flex-col">
-            <span className="text-xl font-bold text-primary leading-tight">
+            <span className="text-base font-bold text-primary leading-tight">
               Prefeitura de Pacajus
             </span>
-            <span className="text-sm text-base-content/70 leading-tight">
+            <span className="text-xs text-base-content/70 leading-tight">
               Sistema de Gestão
             </span>
           </div>
@@ -47,7 +46,7 @@ export function Navbar() {
       </div>
       
       <div className="flex-none gap-2">
-        {status === 'authenticated' && session?.user ? (
+        {isAuthenticated && session?.user ? (
           <div className="dropdown dropdown-end">
             <label tabIndex={0} className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-base-200 cursor-pointer">
               <div className="flex items-center gap-2">

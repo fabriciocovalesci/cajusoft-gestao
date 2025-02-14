@@ -13,6 +13,9 @@ const vagasSchema = z.object({
   dataInicio: z.string().min(1, "A data é obrigatória"),
   horarioInicio: z.string().min(1, "O horário de início é obrigatório"),
   horarioTermino: z.string().min(1, "O horário de término é obrigatório"),
+  servico: z.enum(['Emissão de RG', 'Emissão de Reservista', 'Segunda Via de RG'], {
+    required_error: "O serviço é obrigatório"
+  })
 }).refine((data) => {
   const inicio = new Date(`2000-01-01T${data.horarioInicio}`);
   const termino = new Date(`2000-01-01T${data.horarioTermino}`);
@@ -24,7 +27,7 @@ const vagasSchema = z.object({
 
 type VagasFormData = z.infer<typeof vagasSchema>;
 
-// Função auxiliar para gerar horários com intervalo de 30 minutos
+
 const gerarHorarios = (): string[] => {
   const horarios: string[] = [];
   for (let hora = 7; hora <= 17; hora++) {
@@ -59,29 +62,39 @@ export default function CasaDoCidadao() {
       horarioInicio: '08:00',
       horarioTermino: '17:00',
       totalVagas: 30,
+      servico: undefined
     },
   });
 
   const onSubmit = async (data: VagasFormData) => {
     try {
-      console.log('Dados do formulário:', data);
-      
-      const vagasExistentes = false;
+      const response = await fetch('/api/vagas-casa-cidadao', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          dataInicio: data.dataInicio,
+          horarioInicio: data.horarioInicio,
+          horarioTermino: data.horarioTermino,
+          totalVagas: data.totalVagas,
+          servico: data.servico
+        }),
+      });
 
-      if (vagasExistentes) {
-        const confirmaAtualizacao = window.confirm(
-          "Já existem vagas cadastradas para esta data. Deseja atualizar?"
-        );
-        if (!confirmaAtualizacao) return;
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Erro ao cadastrar vagas');
       }
 
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
+      const result = await response.json();
+      console.log('Vagas cadastradas:', result);
+
       toast.success("Vagas cadastradas com sucesso!");
       router.push("/home");
-    } catch (error) {
+    } catch (error: any) {
       console.error('Erro ao cadastrar vagas:', error);
-      toast.error("Erro ao cadastrar vagas. Tente novamente.");
+      toast.error(error.message || "Erro ao cadastrar vagas. Tente novamente.");
     }
   };
 
@@ -108,7 +121,7 @@ export default function CasaDoCidadao() {
                   </label>
                   <input
                     type="number"
-                    className={`input input-bordered ${errors.totalVagas ? 'input-error' : ''}`}
+                    className={`input input-bordered text-neutral ${errors.totalVagas ? 'input-error' : ''}`}
                     {...register("totalVagas", { valueAsNumber: true })}
                   />
                   {errors.totalVagas && (
@@ -130,7 +143,7 @@ export default function CasaDoCidadao() {
                   </label>
                   <input
                     type="date"
-                    className={`input input-bordered ${errors.dataInicio ? 'input-error' : ''}`}
+                    className={`input input-bordered text-neutral ${errors.dataInicio ? 'input-error' : ''}`}
                     min={new Date().toISOString().split('T')[0]}
                     {...register("dataInicio")}
                   />
@@ -154,7 +167,7 @@ export default function CasaDoCidadao() {
                     </span>
                   </label>
                   <select
-                    className={`select select-bordered ${errors.horarioInicio ? 'select-error' : ''}`}
+                    className={`select select-bordered text-neutral ${errors.horarioInicio ? 'select-error' : ''}`}
                     {...register("horarioInicio")}
                   >
                     {horarios.map((horario) => (
@@ -181,7 +194,7 @@ export default function CasaDoCidadao() {
                     </span>
                   </label>
                   <select
-                    className={`select select-bordered ${errors.horarioTermino ? 'select-error' : ''}`}
+                    className={`select select-bordered text-neutral ${errors.horarioTermino ? 'select-error' : ''}`}
                     {...register("horarioTermino")}
                   >
                     {horarios.map((horario) => (
@@ -200,11 +213,36 @@ export default function CasaDoCidadao() {
                 </div>
               </div>
 
+              <div className="form-control">
+                <label className="label">
+                  <span className="label-text flex items-center gap-2">
+                    <FaUsers className="text-primary" />
+                    Tipo de Serviço
+                  </span>
+                </label>
+                <select
+                  className={`select select-bordered text-neutral ${errors.servico ? 'select-error' : ''}`}
+                  {...register("servico")}
+                >
+                  <option value="">Selecione um serviço</option>
+                  <option value="Emissão de RG">Emissão de RG</option>
+                  <option value="Emissão de Reservista">Emissão de Reservista</option>
+                  <option value="Segunda Via de RG">Segunda Via de RG</option>
+                </select>
+                {errors.servico && (
+                  <label className="label">
+                    <span className="label-text-alt text-error">
+                      {errors.servico.message}
+                    </span>
+                  </label>
+                )}
+              </div>
+
               <div className="card-actions justify-end mt-8">
                 <button
                   type="button"
                   onClick={() => router.push("/home")}
-                  className="btn btn-ghost"
+                  className="btn bg-cancel hover:bg-cancel/80 text-cancel-content"
                 >
                   Cancelar
                 </button>

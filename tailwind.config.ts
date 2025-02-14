@@ -31,6 +31,8 @@ const config: Config = {
           "base-content": "#172B4D",
           "neutral": "#253858",
           "neutral-content": "#FFFFFF",
+          "cancel": "#4B5563",
+          "cancel-content": "#FFFFFF",
           "info": "#0065FF",
           "success": "#36B37E",
           "warning": "#FFAB00",
