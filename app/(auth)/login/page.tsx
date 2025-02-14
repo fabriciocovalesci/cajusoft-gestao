@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { useAuth } from '@/app/hooks/useAuth';
+import { useSession } from "next-auth/react";
 import { toast } from "react-toastify";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -21,7 +21,7 @@ type LoginFormData = z.infer<typeof loginSchema>;
 
 export default function Login() {
   const router = useRouter();
-  const { isLoading: authChecking } = useAuth(false);
+  const { status } = useSession();
   const [isLoading, setIsLoading] = useState(false);
 
   const {
@@ -32,22 +32,13 @@ export default function Login() {
     resolver: zodResolver(loginSchema),
   });
 
-  // Se já estiver autenticado, redireciona para home
+  // Verifica se já está autenticado
   useEffect(() => {
-    const token = localStorage.getItem('userToken');
-    if (token) {
-      router.push('/home');
-      return;
+    if (status === 'authenticated') {
+      console.log('Já autenticado na página de login');
+      router.replace('/home');
     }
-  }, [router]);
-
-  if (authChecking) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <span className="loading loading-spinner loading-lg"></span>
-      </div>
-    );
-  }
+  }, [status, router]);
 
   const onSubmit = async (data: LoginFormData) => {
     setIsLoading(true);
@@ -65,15 +56,9 @@ export default function Login() {
       }
 
       if (result?.ok) {
+        console.log('Login bem sucedido, redirecionando');
+        router.replace("/home");
         toast.success("Login realizado com sucesso!");
-        
-        // Força o redirecionamento imediato
-        router.replace('/home');
-        
-        // Força um hard refresh após um pequeno delay
-        setTimeout(() => {
-          window.location.href = '/home';
-        }, 100);
       }
     } catch (error) {
       console.error("Erro no login:", error);

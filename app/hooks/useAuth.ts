@@ -11,7 +11,11 @@ export function useAuth(requireAuth = true) {
     if (status === 'loading') return;
 
     if (requireAuth && !session) {
+      console.log('Não autenticado, redirecionando para login');
       router.replace('/login');
+    } else if (!requireAuth && session) {
+      console.log('Já autenticado, redirecionando para home');
+      router.replace('/home');
     } else {
       setIsLoading(false);
     }

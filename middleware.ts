@@ -11,13 +11,22 @@ export function middleware(request: NextRequest) {
                          request.nextUrl.pathname.startsWith('/cadastro-unico') ||
                          request.nextUrl.pathname.startsWith('/usuarios');
 
+  console.log('Middleware:', {
+    path: request.nextUrl.pathname,
+    isAuthenticated,
+    isPublicPath,
+    isProtectedPath
+  });
+
   // Se estiver autenticado e tentar acessar páginas públicas, redireciona para home
   if (isAuthenticated && isPublicPath) {
+    console.log('Redirecionando para home (autenticado em rota pública)');
     return NextResponse.redirect(new URL('/home', request.url));
   }
 
   // Se não estiver autenticado e tentar acessar páginas protegidas
   if (!isAuthenticated && isProtectedPath) {
+    console.log('Redirecionando para login (não autenticado em rota protegida)');
     return NextResponse.redirect(new URL('/login', request.url));
   }
 
