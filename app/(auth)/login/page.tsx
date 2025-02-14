@@ -65,8 +65,15 @@ export default function Login() {
       }
 
       if (result?.ok) {
-        router.replace("/home");
         toast.success("Login realizado com sucesso!");
+        
+        // Força o redirecionamento imediato
+        router.replace('/home');
+        
+        // Força um hard refresh após um pequeno delay
+        setTimeout(() => {
+          window.location.href = '/home';
+        }, 100);
       }
     } catch (error) {
       console.error("Erro no login:", error);
