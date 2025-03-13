@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+
+{% block hero %}
+<section class="hero-section">
+    <div class="container">
+        <div class="hero-content text-center">
+            <h1 class="hero-title">Bem-vindo ao Hora Marcada Pacajus</h1>
+            <p class="hero-subtitle">Agende seus serviços de forma rápida e conveniente</p>
+            <div class="d-flex justify-content-center gap-3">
+                <a href="{% url 'agendar_list' %}" class="btn btn-accent"><i class="fas fa-calendar-plus me-2"></i>Agendar Agora</a>
+                <a href="{% url 'servico_list' %}" class="btn btn-outline-light"><i class="fas fa-info-circle me-2"></i>Nossos Serviços</a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block content %}
+<section class="cta-section">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="cta-card">
+                    <div class="cta-icon">
+                        <i class="fas fa-calendar-check"></i>
+                    </div>
+                    <h3>Agendamento Fácil</h3>
+                    <p>Agende seus serviços em poucos cliques, escolhendo o melhor horário para você.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="cta-card">
+                    <div class="cta-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <h3>Economize Tempo</h3>
+                    <p>Evite filas e esperas desnecessárias com nosso sistema de agendamento online.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="cta-card">
+                    <div class="cta-icon">
+                        <i class="fas fa-user-shield"></i>
+                    </div>
+                    <h3>Atendimento Seguro</h3>
+                    <p>Garantimos um atendimento organizado e seguro para todos os cidadãos.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="features-section py-5">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-6">
+                <h2 class="mb-4" style="color: var(--primary-color)">Por que escolher nosso sistema?</h2>
+                <ul class="list-unstyled">
+                    <li class="mb-3">
+                        <i class="fas fa-check-circle me-2" style="color: var(--accent-color)"></i>
+                        Agendamento online 24/7
+                    </li>
+                    <li class="mb-3">
+                        <i class="fas fa-check-circle me-2" style="color: var(--accent-color)"></i>
+                        Interface intuitiva e fácil de usar
+                    </li>
+                    <li class="mb-3">
+                        <i class="fas fa-check-circle me-2" style="color: var(--accent-color)"></i>
+                        Lembretes automáticos de agendamento
+                    </li>
+                    <li class="mb-3">
+                        <i class="fas fa-check-circle me-2" style="color: var(--accent-color)"></i>
+                        Suporte técnico disponível
+                    </li>
+                </ul>
+            </div>
+            <div class="col-md-6 text-center">
+                <img src="https://www.pacajus.ce.gov.br/imagens/logo.png" alt="Pacajus" class="img-fluid" style="max-width: 400px;">
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

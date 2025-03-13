@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+
+{% block hero %}
+<section class="hero-section bg-primary text-white py-5">
+    <div class="container hero-content text-center">
+        <h1 class="hero-title display-4 mb-3">Agendamento Simples e Prático</h1>
+        <p class="hero-subtitle lead mb-4">Fique ligado(a)! Para uma maior comodidade, as vagas serão liberadas diariamente às 6h da manhã. Acesse neste horário e agende seu atendimento.</p>
+        <a href="{% url 'agendar_list' %}" class="btn btn-light btn-lg shadow-sm">
+            <i class="bi bi-calendar-plus me-2"></i>Clique aqui para agendar
+        </a>
+    </div>
+</section>
+{% endblock %}
+
+{% block content %}
+<section class="cta-section py-5">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-12 col-md-4">
+                <div class="card h-100 shadow-sm hover-card">
+                    <div class="card-body text-center p-4">
+                        <div class="cta-icon mb-3">
+                            <i class="bi bi-person-plus-fill display-4 text-primary"></i>
+                        </div>
+                        <h3 class="card-title h4 mb-3">Faça seu Cadastro!</h3>
+                        <p class="card-text text-muted mb-4">Crie sua conta para começar a agendar</p>
+                        <a href="{% url 'register' %}" class="btn btn-outline-primary w-100">
+                            <i class="bi bi-arrow-right-circle me-2"></i>Cadastrar
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-md-4">
+                <div class="card h-100 shadow-sm hover-card">
+                    <div class="card-body text-center p-4">
+                        <div class="cta-icon mb-3">
+                            <i class="bi bi-calendar2-check display-4 text-primary"></i>
+                        </div>
+                        <h3 class="card-title h4 mb-3">Bora agendar!</h3>
+                        <p class="card-text text-muted mb-4">Escolha o serviço e horário desejado</p>
+                        <a href="{% url 'agendar_list' %}" class="btn btn-outline-primary w-100">
+                            <i class="bi bi-clock me-2"></i>Agendar
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-md-4">
+                <div class="card h-100 shadow-sm hover-card">
+                    <div class="card-body text-center p-4">
+                        <div class="cta-icon mb-3">
+                            <i class="bi bi-list-check display-4 text-primary"></i>
+                        </div>
+                        <h3 class="card-title h4 mb-3">Conferir Agendamento</h3>
+                        <p class="card-text text-muted mb-4">Verifique seus agendamentos ativos</p>
+                        <a href="{% url 'agendamento_list' %}" class="btn btn-outline-primary w-100">
+                            <i class="bi bi-eye me-2"></i>Conferir
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+.hero-section {
+    background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+}
+
+.hover-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.hover-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 0.4rem 0.8rem rgba(0, 0, 0, 0.12) !important;
+}
+
+.card {
+    border: none;
+    border-radius: 1rem;
+}
+
+.btn {
+    border-radius: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    transition: all 0.2s ease;
+    font-weight: 500;
+    color: #0d6efd;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.1);
+    color: #fff;
+}
+
+@media (max-width: 768px) {
+    .hero-title {
+        font-size: 2rem;
+    }
+    
+    .hero-subtitle {
+        font-size: 1rem;
+    }
+    
+    .card-body {
+        padding: 1.5rem !important;
+    }
+}
+</style>
+{% endblock %}
+
+
+
+
+
+
+
+
+

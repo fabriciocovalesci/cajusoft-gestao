@@ -1,0 +1,122 @@
+
+
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-5">
+    <!-- <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="fw-bold text-primary">Minha Agenda</h3>
+        <a href="{% url 'agendar_create' %}" class="btn btn-primary">
+            <i class="bi bi-plus-circle me-2"></i>Novo Agendamento
+        </a>
+    </div> -->
+
+    <div class="row g-4">
+        {% for agendamento in object_list %}
+        <div class="col-12 col-md-6 col-lg-4">
+            <div class="card h-100 shadow-sm hover-card">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center mb-3">
+                        <i class="bi bi-calendar-event text-primary fs-4 me-2"></i>
+                        <h5 class="card-title mb-0">{{ agendamento.servico }}</h5>
+                    </div>
+                    <div class="card-text mb-3">
+                        <p class="mb-2">
+                            <i class="bi bi-person text-muted me-2"></i>
+                            {{ agendamento.cliente.username }}
+                        </p>
+                        <p class="mb-2">
+                            <i class="bi bi-clock text-muted me-2"></i>
+                        Horario  {{ agendamento.horario }}
+                        </p>
+                        <p class="mb-0">
+                            <i class="bi bi-calendar-date text-muted me-2"></i>
+                           Date {{ agendamento.data_agendamento|date:"d/m/Y" }}
+                        </p>
+                    </div>
+                    <div class="d-flex gap-2 mt-auto">
+                        <a href="{% url 'agendar_detail' agendamento.pk %}" class="btn btn-outline-info flex-grow-1">
+                            <i class="bi bi-eye me-2"></i>Ver
+                        </a>
+                        <!-- <a href="{% url 'agendar_update' agendamento.pk %}" class="btn btn-outline-warning flex-grow-1">
+                            <i class="bi bi-pencil me-2"></i>Editar
+                        </a> -->
+                        <button type="button" class="btn btn-outline-danger flex-grow-1" data-bs-toggle="modal" data-bs-target="#cancelModal{{ agendamento.pk }}">
+                            <i class="bi bi-trash me-2"></i>Cancelar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal de Confirmação para cada agendamento -->
+        <div class="modal fade" id="cancelModal{{ agendamento.pk }}" tabindex="-1" aria-labelledby="cancelModalLabel{{ agendamento.pk }}" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="cancelModalLabel{{ agendamento.pk }}">Confirmar Cancelamento</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Você tem certeza que deseja cancelar este agendamento?</p>
+                        <p><strong>Serviço:</strong> {{ agendamento.servico }}</p>
+                        <p><strong>Data:</strong> {{ agendamento.data_agendamento|date:"d/m/Y" }}</p>
+                        <p><strong>Horário:</strong> {{ agendamento.horario }}</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                        <form action="{% url 'agendar_cancel' agendamento.pk %}" method="post" style="display: inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger">Confirmar Cancelamento</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="alert alert-info text-center" role="alert">
+                <i class="bi bi-info-circle me-2"></i>Nenhum agendamento encontrado.
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<style>
+.hover-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.hover-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+}
+
+.card {
+    border: none;
+    border-radius: 1rem;
+}
+
+.btn {
+    border-radius: 0.5rem;
+    padding: 0.5rem 1rem;
+    transition: all 0.2s ease;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.1);
+}
+
+@media (max-width: 768px) {
+    .card-body {
+        padding: 1rem !important;
+    }
+    
+    .btn {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.9rem;
+    }
+}
+</style>
+{% endblock %}

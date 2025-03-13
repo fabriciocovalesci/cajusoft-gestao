@@ -1,0 +1,577 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container py-5">
+    <div class="card shadow-lg border-0 rounded-3">
+        <div class="card-header bg-primary text-white py-3">
+            <h4 class="mb-0">
+                <i class="bi bi-calendar-plus me-2"></i>
+                {% if object %}Editar Agendamento{% else %}Novo Agendamento{% endif %}
+            </h4>
+        </div>
+        <div class="card-body p-4">
+            <form method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+                {% csrf_token %}
+
+
+                <div class="row g-4">
+                    <div class="col-12 col-md-6">
+                        <div class="form-floating mb-3 mb-md-0" id="id_estado_civil">
+                            {{ form.data  }}
+
+                            <label for="{{ form.data.id_for_label }}">
+                                <i class="bi bi-person-badge me-2"></i>Data do Agendamento
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <div class="form-floating mb-3 mb-md-0" id="id_estado_civil">
+                            {{ form.estado_civil }}
+                            <label for="{{ form.estado_civil.id_for_label }}">
+                                <i class="bi bi-person-badge me-2"></i>Estado Civil
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <div class="form-floating mb-3 mb-md-0">
+                            <select id="atributo" name="atributo" class="form-select">
+                                {% for svc in form.servico.field.queryset %}
+                                    <option value="{{ svc.atributo1 }}">{{ svc.atributo1 }}</option>
+                                    <option value="{{ svc.atributo2 }}">{{ svc.atributo2 }}</option>
+                                    <option value="{{ svc.atributo3 }}">{{ svc.atributo3 }}</option>
+                                {% endfor %}
+                            </select>
+                            <label for="atributo">
+                                <i class="bi bi-list-check me-2"></i>Serviço
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-md-6">
+                        <div class="form-floating">
+                            {{ form.vagas }}
+                            <label for="id_horarios_disponiveis">
+                                <i class="bi bi-clock me-2"></i>Vagas
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="form-floating">
+                            <div class="time-slots-grid">
+                                {% for horario in form.horarios_disponiveis %}
+                                <button type="button" 
+                                    class="btn btn-outline-primary time-slot-btn{% if horario.value == form.horarios_disponiveis.value %} active{% endif %}" 
+                                    data-time="{{ horario.value }}" 
+                                    onclick="selectTimeSlot(this)">
+                                    {{ horario }}
+                                </button>
+                                {% endfor %}
+                            </div>
+                            <input type="hidden" name="horarios_disponiveis" id="selected_time" value="{{ form.horarios_disponiveis.value }}">
+                        </div>
+                    </div>
+                    
+
+
+                   
+                </div>
+
+                <!-- Solteiro -->
+
+                <div class="container">
+                    <div class="d-flex align-items-center mb-3">
+                        <i class="bi bi-file-earmark-text fs-4 text-primary me-2"></i>
+                        <h5 class="mb-0">Documentos Necessários</h5>
+                    </div>
+                    <div class="row">
+
+            <div class="col-lg-6 col-md-6 col-sm-12 documento" data-estado-civil="solteiro">
+                <div class="form-floating">{{ form.certidao_nascimento }}
+                    <label for="{{ form.certidao_nascimento.id_for_label }}">
+                        <i class="bi bi-file-earmark me-2"></i>Certidão de Nascimento
+                    </label>
+                </div>
+            </div>
+            <div class="col-lg-6 col-md-6 col-sm-12 documento" data-estado-civil="solteiro">
+                <div class="form-floating">{{ form.cpf_documento }}
+                    <label for="{{ form.cpf.id_for_label }}">
+                        <i class="bi bi-file-earmark me-2"></i>CPF
+                    </label>
+                </div>
+            </div>
+            <div class="col-lg-6 col-md-6 col-sm-12 documento" data-estado-civil="solteiro">
+                <div class="form-floating">{{ form.comprovante_residencia }}
+                    <label for="{{ form.comprovante_residencia.id_for_label }}">
+                        <i class="bi bi-file-earmark me-2"></i>Comprovante de Residência
+                    </label>
+                </div>
+            </div>
+            <div class="col-lg-6 col-md-6 col-sm-12 documento" data-estado-civil="solteiro">
+                <div class="form-floating">{{ form.rg_frente }}
+                    <label for="{{ form.rg_antigo.id_for_label }}">
+                        <i class="bi bi-file-earmark me-2"></i>RG Antigo Frente
+                    </label>
+                </div>
+            </div>
+            <div class="col-lg-6 col-md-6 col-sm-12 documento" data-estado-civil="solteiro">
+                <div class="form-floating">{{ form.rg_verso }}
+                    <label for="{{ form.rg_antigo.id_for_label }}">
+                        <i class="bi bi-file-earmark me-2"></i>RG Antigo Verso
+                    </label>
+                </div>
+            </div>
+
+            <!-- Casado -->
+            <div class="col-lg-6 col-md-6 col-sm-12 documento" data-estado-civil="casado">
+                <div class="form-floating">{{ form.certidao_casamento }}
+                    <label for="{{ form.certidao_casamento.id_for_label }}">
+                        <i class="bi bi-file-earmark me-2"></i>Certidão de Casamento
+                    </label>
+                </div>
+            </div>
+            <div class="col-lg-6 col-md-6 col-sm-12 documento" data-estado-civil="casado">
+                <div class="form-floating">{{ form.comprovante_residencia }}
+                    <label for="{{ form.comprovante_residencia.id_for_label }}">
+                        <i class="bi bi-file-earmark me-2"></i>Comprovante de Residência
+                    </label>
+                </div>
+            </div>
+            <div class="col-lg-6 col-md-6 col-sm-12 documento" data-estado-civil="casado">
+                <div class="form-floating">{{ form.rg_verso }}
+                    <label for="{{ form.rg_verso.id_for_label }}">
+                        <i class="bi bi-file-earmark me-2"></i>RG Antigo Verso
+                    </label>
+                </div>
+            </div>
+            <div class="col-lg-6 col-md-6 col-sm-12 documento" data-estado-civil="casado">
+                <div class="form-floating">{{ form.rg_frente }}
+                    <label for="{{ form.rg_verso.id_for_label }}">
+                        <i class="bi bi-file-earmark me-2"></i>RG Antigo Frente
+                    </label>
+                </div>
+            </div>
+            <div class="col-lg-6 col-md-6 col-sm-12 documento" data-estado-civil="casado">
+                <div class="form-floating">{{ form.cpf_documento }}
+                    <label for="{{ form.cpf_documento.id_for_label }}">
+                        <i class="bi bi-file-earmark me-2"></i>CPF Atualizado
+                    </label>
+                </div>
+            </div>
+
+            <!-- Viúvo -->
+            <div class="col-lg-6 col-md-6 col-sm-12 documento" data-estado-civil="viuvo">
+                <div class="form-floating">{{ form.certidao_obito }}
+                    <label for="{{ form.certidao_obito.id_for_label }}">
+                        <i class="bi bi-file-earmark me-2"></i>Certidão de Óbito
+                    </label>
+                </div>
+            </div>
+            <div class="col-lg-6 col-md-6 col-sm-12 documento" data-estado-civil="viuvo">
+                <div class="form-floating">{{ form.comprovante_residencia }}
+                    <label for="{{ form.comprovante_residencia.id_for_label }}">
+                        <i class="bi bi-file-earmark me-2"></i>Comprovante de Residência
+                    </label>
+                </div>
+            </div>
+            <div class="col-lg-6 col-md-6 col-sm-12 documento" data-estado-civil="viuvo">
+                <div class="form-floating">{{ form.rg_verso }}
+                    <label for="{{ form.rg_verso.id_for_label }}">
+                        <i class="bi bi-file-earmark me-2"></i>RG Antigo Verso
+                    </label>
+                </div>
+            </div>
+            <div class="col-lg-6 col-md-6 col-sm-12 documento" data-estado-civil="viuvo">
+                <div class="form-floating">{{ form.rg_frente }}
+                    <label for="{{ form.rg_verso.id_for_label }}">
+                        <i class="bi bi-file-earmark me-2"></i>RG Antigo Frente
+                    </label>
+                </div>
+            </div>
+            <div class="col-lg-6 col-md-6 col-sm-12 documento" data-estado-civil="viuvo">
+                <div class="form-floating">{{ form.cpf_documento }}
+                    <label for="{{ form.cpf_documento.id_for_label }}">
+                        <i class="bi bi-file-earmark me-2"></i>CPF Atualizado
+                    </label>
+                </div>
+            </div>
+
+            <!-- Divorciado -->
+            <div class="col-lg-6 col-md-6 col-sm-12 documento" data-estado-civil="divorciado">
+                <div class="form-floating">{{ form.certidao_casamento_averbada }}
+                    <label for="{{ form.certidao_casamento_averbada.id_for_label }}">
+                        <i class="bi bi-file-earmark me-2"></i>Certidão de Casamento Averbada
+                    </label>
+                </div>
+            </div>
+            <div class="col-lg-6 col-md-6 col-sm-12 documento" data-estado-civil="divorciado">
+                <div class="form-floating">{{ form.comprovante_residencia }}
+                    <label for="{{ form.comprovante_residencia.id_for_label }}">
+                        <i class="bi bi-file-earmark me-2"></i>Comprovante de Residência
+                    </label>
+                </div>
+            </div>
+            <div class="col-lg-6 col-md-6 col-sm-12 documento" data-estado-civil="divorciado">
+                <div class="form-floating">{{ form.rg_verso }}
+                    <label for="{{ form.rg_verso.id_for_label }}">
+                        <i class="bi bi-file-earmark me-2"></i>RG Antigo Verso
+                    </label>
+                </div>
+            </div>
+            <div class="col-lg-6 col-md-6 col-sm-12 documento" data-estado-civil="divorciado">
+                <div class="form-floating">{{ form.rg_frente }}
+                    <label for="{{ form.rg_verso.id_for_label }}">
+                        <i class="bi bi-file-earmark me-2"></i>RG Antigo Frente
+                    </label>
+                </div>
+            </div>
+            <div class="col-lg-6 col-md-6 col-sm-12 documento" data-estado-civil="divorciado">
+                <div class="form-floating">{{ form.cpf_documento }}
+                    <label for="{{ form.cpf_documento.id_for_label }}">
+                        <i class="bi bi-file-earmark me-2"></i>CPF Atualizado
+                    </label>
+                </div>
+            </div>
+
+            <!-- Menor de 16 anos -->
+            <div class="col-lg-6 col-md-6 col-sm-12 documento" data-estado-civil="menor">
+                <div class="form-floating">{{ form.certidao_nascimento }}
+                    <label for="{{ form.certidao_nascimento.id_for_label }}">
+                        <i class="bi bi-file-earmark me-2"></i>Certidão de Nascimento
+                    </label>
+                </div>
+            </div>
+            <div class="col-lg-6 col-md-6 col-sm-12 documento" data-estado-civil="menor">
+                <div class="form-floating">{{ form.cpf_documento }}
+                    <label for="{{ form.cpf.id_for_label }}">
+                        <i class="bi bi-file-earmark me-2"></i>CPF
+                    </label>
+                </div>
+            </div>
+            <div class="col-lg-6 col-md-6 col-sm-12 documento" data-estado-civil="menor">
+                <div class="form-floating">{{ form.comprovante_residencia }}
+                    <label for="{{ form.comprovante_residencia.id_for_label }}">
+                        <i class="bi bi-file-earmark me-2"></i>Comprovante de Residência
+                    </label>
+                </div>
+            </div>
+            <div class="col-lg-6 col-md-6 col-sm-12 documento" data-estado-civil="menor">
+                <div class="form-floating">{{ form.autorizacao_pais }}
+                    <label for="{{ form.autorizacao_pais.id_for_label }}">
+                        <i class="bi bi-file-earmark me-2"></i>Documento do Responsável Legal
+                    </label>
+                </div>
+            </div>
+        </div>
+                </div>
+            </div>
+
+        
+                <div class="d-flex justify-content-end gap-3 p-3">
+                    <a href="{% url 'agendar_list' %}" class="btn btn-outline-secondary">
+                        <i class="bi bi-x-circle me-2"></i>Cancelar
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-check-circle me-2"></i>Salvar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+.btn-outline-secondary:hover {
+    background-color: #e8ebef; /* Cor de fundo ao passar o mouse (exemplo: azul) */
+    color: rgb(31, 117, 237); /* Cor do texto ao passar o mouse */
+    border-color: #007bff; /* Cor da borda ao passar o mouse */
+}
+     /* Melhorias no input */
+     .form-floating input {
+        border: 2px solid #007bff; /* Azul principal */
+        border-radius: 6px;
+        background-color: #f8fbff; /* Azul bem claro no fundo */
+        color: #004085; /* Azul escuro para texto */
+        transition: all 0.3s ease-in-out;
+    }
+
+    /* Efeito ao focar no input */
+    .form-floating input:focus {
+        border-color: #0056b3; /* Azul mais forte */
+        box-shadow: 0 0 8px rgba(0, 123, 255, 0.5);
+        background-color: white;
+    }
+
+    /* Melhorar rótulo */
+    .form-floating label {
+        color: #0056b3;
+        font-weight: 500;
+    }
+
+    /* Ícone azul escuro */
+    .form-floating label i {
+        color: #003366;
+    }
+
+    /* Efeito ao passar o mouse */
+    .form-floating:hover input {
+        border-color: #0069d9;
+        background-color: #eef5ff;
+    }
+
+
+.form-floating > label {
+    padding-left: 1.75rem;
+}
+
+.form-control,
+.form-select {
+    height: 58px;
+    font-size: 1rem;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+/* Enhanced file input styling */
+.form-control[type="file"] {
+    padding: 0.75rem;
+    line-height: 1.5;
+    background-color: #f8f9fa;
+    border: 2px dashed #dee2e6;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+}
+
+
+
+/*  */
+
+/* .btn:hover {
+    transform: translateY(-2px);
+} */
+
+.card {
+    transition: all 0.3s ease-in-out;
+}
+
+/* Style for time selection */
+#id_horarios_disponiveis {
+    height: 58px;
+    font-size: 1rem;
+    border-radius: 0.375rem;
+    transition: all 0.2s ease-in-out;
+}
+
+#id_horarios_disponiveis:hover {
+    border-color: #0d6efd;
+}
+
+#id_horarios_disponiveis:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+/* Adjust label positioning for horarios_disponiveis */
+#id_horarios_disponiveis + label {
+    transform: scale(.85) translateY(-0.5rem) translateX(0.15rem);
+    opacity: .65;
+}
+
+#id_horarios_disponiveis:placeholder-shown + label {
+    transform: translateY(1rem) translateX(0.75rem);
+    opacity: .65;
+}
+
+#id_horarios_disponiveis:focus + label {
+    transform: scale(.85) translateY(-0.5rem) translateX(0.15rem);
+    opacity: .65;
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding: 1rem;
+    }
+    
+    .card-body {
+        padding: 1.5rem !important;
+    }
+    
+    .form-control[type="file"] {
+        font-size: 0.875rem;
+        padding: 0.5rem;
+    }
+    
+    .form-control[type="file"]::file-selector-button {
+        padding: 0.375rem 0.75rem;
+        margin: -0.375rem 0.75rem -0.375rem -0.5rem;
+    }
+    
+    .btn {
+        width: 100%;
+        margin: 0.5rem 0;
+    }
+    
+    .d-flex.justify-content-end {
+        flex-direction: column-reverse;
+    }
+}
+/* Adjust the form-floating container */
+.form-floating {
+    width: 100%;
+    margin-bottom: 1rem;
+}
+
+/* Ensure the container div takes full width */
+.col-12 .form-floating {
+    width: 100%;
+    display: block;
+}
+
+/* Adjust select element within form-floating */
+.form-floating select,
+.form-floating .form-select {
+    width: 100%;
+    height: 58px;
+    padding-top: 1.625rem;
+    padding-bottom: 0.625rem;
+    line-height: 1.25;
+}
+
+/* Ensure proper label positioning */
+.form-floating > label {
+    padding: 1rem 0.75rem;
+    height: auto;
+    transform-origin: 0 0;
+}
+
+/* Adjust select dropdown size */
+select option {
+    padding: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.form-select {
+    max-height: 300px; /* Limit maximum height of dropdown */
+}
+
+select[multiple] {
+    height: auto !important;
+    max-height: 200px !important; /* For multiple select */
+}
+.time-slots-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 10px;
+    padding: 15px 0;
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+.time-slot-btn {
+    width: 100%;
+    padding: 12px 8px;
+    transition: all 0.3s ease;
+    border: 2px solid #0d6efd;
+    background-color: transparent;
+    color: #0d6efd;
+    font-size: 0.95rem;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.time-slot-btn:hover {
+    background-color: #0d6efd; /* Azul padrão do Bootstrap */
+    color: white; /* Mantém o texto branco */
+    border-color: #0d6efd; /* Mantém a borda azul */
+}
+
+.time-slot-btn.active {
+    background-color: #0d6efd !important;  /* Cor azul */
+    color: white !important;              /* Texto branco */
+    border-color: #0d6efd !important;
+}
+
+
+@media (max-width: 576px) {
+    .time-slots-grid {
+        grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+        gap: 8px;
+        padding: 10px 0;
+    }
+    
+    .time-slot-btn {
+        padding: 10px 6px;
+        font-size: 0.85rem;
+        min-height: 44px;
+    }
+}
+</style>
+
+
+<script>
+    /*
+    Solteiro: certidao nascimento, cpf, comprovante residencia, RG antigo
+    Casado: certidao casamento, certidao casamento averbada, comprovante residencia, RG antigo, CPF atualizado
+    viuvo: certidao obito, comprovante residencia, RG antigo
+    divorciado: certidao casamento averbada, comprovante residencia, RG antigo, CPF atualizado
+    menor 16: certidao nascimento, CPF,  comprovante residencia, documento com foto do responsavel legal
+    
+    */
+    document.addEventListener("DOMContentLoaded", function () {
+    const estadoCivilSelect = document.querySelector("select[name='estado_civil']");
+    const documentos = document.querySelectorAll(".documento");
+
+    const selectedTime = document.getElementById("selected_time").value;
+
+    document.querySelectorAll('.time-slot-btn').forEach(button => {
+        if (button.getAttribute("data-time") === selectedTime) {
+            button.classList.add("active"); // Mantém o botão azul apenas se for o valor selecionado
+        } else {
+            button.classList.remove("active"); // Remove a cor azul dos outros botões
+        }
+    });
+
+    function atualizarCampos() {
+        const estadoSelecionado = estadoCivilSelect.value.toLowerCase();
+
+        documentos.forEach(doc => {
+            const estadoRequerido = doc.getAttribute("data-estado-civil");
+            console.log("1, ", estadoRequerido, "2, ", estadoSelecionado);
+            if (estadoRequerido == estadoSelecionado) {
+                doc.style.display = "block";
+            } else {
+                doc.style.display = "none";
+            }
+        });
+    }
+
+    estadoCivilSelect.addEventListener("change", atualizarCampos);
+    atualizarCampos(); // Chamada inicial para esconder os campos incorretos
+});
+function selectTimeSlot(button) {
+    console.log("Clicou no botão:", button);
+
+    // Remove a classe 'active' de todos os botões
+    document.querySelectorAll('.time-slot-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+
+    // Adiciona a classe 'active' ao botão clicado
+    button.classList.add('active');
+
+    // Obtém o valor do <option> dentro do botão
+    let selectedValue = button.querySelector("option").value;
+
+    // Atualiza o input hidden
+    document.getElementById('selected_time').value = selectedValue;
+
+    // Debugging: verificar se o valor está correto
+    console.log("Valor selecionado:", selectedValue);
+}
+
+
+
+</script>
+
+{% endblock %}

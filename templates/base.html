@@ -1,0 +1,218 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hora Marcada Pacajus</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #003087;
+            --accent-color: #F5A623;
+            --gradient-start: #e0f7fa;
+            --gradient-end: #4caf50;
+        }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f8f9fa;
+        }
+        .navbar {
+            background-color: var(--primary-color) !important;
+            padding: 1rem 0;
+        }
+        .navbar-brand img {
+            height: 50px;
+        }
+        .nav-item .nav-link {
+            font-weight: 500;
+            color: #fff !important;
+            transition: 0.3s;
+            padding: 0.5rem 1rem;
+        }
+        .nav-item .nav-link:hover {
+            color: var(--accent-color) !important;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+        }
+        .nav-item .nav-link.text-danger:hover {
+            color: #dc3545 !important;
+            background-color: rgba(220, 53, 69, 0.1);
+        }
+        .nav-item .nav-link.text-danger {
+            color: #fff !important;
+        }
+        .nav-item .nav-link.text-danger:hover {
+            color: var(--accent-color) !important;
+        }
+        .hero-section {
+            background: linear-gradient(var(--gradient-start), var(--gradient-end));
+            color: white;
+            padding: 6rem 0;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+        }
+        .hero-content {
+            position: relative;
+            z-index: 1;
+        }
+        .hero-title {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+        .hero-subtitle {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+        }
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            padding: 0.75rem 2rem;
+            font-weight: 600;
+        }
+      
+        .btn-accent {
+            background-color: var(--accent-color);
+            border-color: var(--accent-color);
+            color: white;
+            padding: 0.75rem 2rem;
+            font-weight: 600;
+        }
+        .btn-accent:hover {
+            background-color: #d48c1f;
+            border-color: #d48c1f;
+            color: white !important;
+        }
+        .btn-outline-light {
+            border-width: 2px;
+            padding: 0.75rem 2rem;
+            font-weight: 600;
+        }
+        .cta-section {
+            padding: 4rem 0;
+        }
+        .cta-card {
+            background: var(--primary-color);
+            color: white;
+            padding: 2rem;
+            border-radius: 1rem;
+            text-align: center;
+            transition: transform 0.3s;
+            margin-bottom: 1.5rem;
+        }
+        .cta-card:hover {
+            transform: translateY(-5px);
+        }
+        .cta-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        .footer {
+            background: #fff;
+            color: #666;
+            padding: 2rem 0;
+            text-align: center;
+            margin-top: 3rem;
+            border-top: 1px solid #dee2e6;
+        }
+        @media (max-width: 768px) {
+            .container {
+                padding-left: 15px;
+                padding-right: 15px;
+                max-width: 100%;
+                overflow-x: hidden;
+            }
+            .navbar {
+                padding: 0.5rem 0;
+            }
+            .navbar-nav {
+                padding: 1rem 0;
+            }
+            .nav-item .nav-link {
+                padding: 0.75rem 1rem;
+                text-align: left;
+                border-radius: 4px;
+                margin: 2px 0;
+            }
+            .hero-title {
+                font-size: 2rem;
+            }
+            .hero-subtitle {
+                font-size: 1rem;
+            }
+            .navbar-brand img {
+                height: 40px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <!-- <img src="https://www.pacajus.ce.gov.br/imagens/logo.png" alt="PacaJus"> -->
+                <img src="{% static 'images/Logo Vertical Branco.png' %}" class="d-none d-lg-block" alt="PacaJus">
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    {% if user.is_authenticated %}
+                        {% if user.userprofile.role in 'admin,secretary,interviewer' %}
+                            <li class="nav-item"><a class="nav-link" href="{% url 'dashboard_home' %}"><i class="fas fa-tachometer-alt me-1"></i>Dashboard</a></li>
+                            <li class="nav-item"><a class="nav-link" href="{% url 'servico_list' %}"><i class="fas fa-list me-1"></i>Serviços</a></li>
+                            <li class="nav-item"><a class="nav-link" href="{% url 'user_management' %}"><i class="fas fa-users-cog me-1"></i>Usuários</a></li>
+                        {% endif %}
+                        <li class="nav-item"><a class="nav-link" href="{% url 'agendamento_list' %}"><i class="fas fa-calendar-check me-1"></i>Agendamentos</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'agendar_list' %}"><i class="fas fa-clock me-1"></i>Minha Agenda</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'agendar_history' %}"><i class="fas fa-history me-1"></i>Histórico</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'profile' %}"><i class="fas fa-user me-1"></i>Perfil</a></li>
+                        <li class="nav-item"><a class="nav-link text-danger" href="{% url 'logout' %}"><i class="fas fa-sign-out-alt me-1"></i>Sair</a></li>
+                    {% else %}
+                        <li class="nav-item"><a class="nav-link" href="{% url 'register' %}"><i class="fas fa-user-plus me-1"></i>Cadastro</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'login' %}"><i class="fas fa-sign-in-alt me-1"></i>Login</a></li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    {% block hero %}
+    {% endblock %}
+
+    <main class="container py-4">
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12">
+                    <!-- <img src="https://www.pacajus.ce.gov.br/imagens/logo.png" alt="PacaJus" style="height: 60px; margin-bottom: 1rem;"> -->
+                    <p class="mb-0">&copy; 2025 CajuSoft - Todos os direitos reservados.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

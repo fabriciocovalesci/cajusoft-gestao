@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container my-5">
+    <!-- Cabeçalho -->
+    <div class="text-center mb-5">
+        <h1 class="display-4 fw-bold text-primary">Bem-vindo ao Sistema de Agendamentos</h1>
+        <p class="lead text-muted">Gerencie seus serviços e agendamentos de forma simples e eficiente.</p>
+    </div>
+
+    <!-- Cards de Ação -->
+    <div class="row g-4">
+        <!-- Criar Serviços -->
+        <div class="col-md-4">
+            <div class="card h-100 shadow border-0">
+                <div class="card-body text-center">
+                    <i class="fas fa-calendar-plus fa-3x mb-3 text-primary"></i>
+                    <h5 class="card-title fw-bold">Criar Serviços</h5>
+                    <p class="card-text text-muted">Adicione novos serviços para seus clientes.</p>
+                    <a href="{% url 'servico_create' %}" class="btn btn-primary btn-sm">Criar Serviço</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Criar Agendamentos -->
+        <div class="col-md-4">
+            <div class="card h-100 shadow border-0">
+                <div class="card-body text-center">
+                    <i class="fas fa-clock fa-3x mb-3 text-success"></i>
+                    <h5 class="card-title fw-bold">Criar Agendamentos</h5>
+                    <p class="card-text text-muted">Defina horários disponíveis para os serviços.</p>
+                    <a href="{% url 'agendamento_create' %}" class="btn btn-success btn-sm">Criar Agendamento</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Agendamentos de Clientes -->
+        <div class="col-md-4">
+            <div class="card h-100 shadow border-0">
+                <div class="card-body text-center">
+                    <i class="fas fa-users fa-3x mb-3 text-info"></i>
+                    <h5 class="card-title fw-bold">Agendamentos de Clientes</h5>
+                    <p class="card-text text-muted">Gerencie os agendamentos feitos pelos clientes.</p>
+                    <a href="{% url 'agendar_create' %}" class="btn btn-info btn-sm">Ver Agendamentos</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Serviços Disponíveis -->
+    <div class="mt-5">
+        <h2 class="text-center mb-4 text-secondary">Serviços Disponíveis</h2>
+        <div class="row g-4">
+            {% for servico in servicos %}
+                <div class="col-md-4">
+                    <div class="card h-100 shadow border-0">
+                        <div class="card-body text-center">
+                            <h5 class="card-title fw-bold">{{ servico.nome }}</h5>
+                            <p class="card-text text-muted">
+                                {% if servico.atributo1 %}{{ servico.atributo1 }}<br>{% endif %}
+                                {% if servico.atributo2 %}{{ servico.atributo2 }}<br>{% endif %}
+                                {% if servico.atributo3 %}{{ servico.atributo3 }}{% endif %}
+                            </p>
+                            <a href="{% url 'servico_detail' servico.pk %}" class="btn btn-outline-info btn-sm">Ver Detalhes</a>
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <p class="text-center text-muted">Nenhum serviço disponível no momento.</p>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Como Funciona -->
+    <div class="mt-5">
+        <h2 class="text-center text-secondary mb-4">Como Funciona?</h2>
+        <div class="row text-center g-4">
+            <div class="col-md-4">
+                <div class="p-3">
+                    <i class="fas fa-check-circle fa-2x text-primary mb-2"></i>
+                    <h5 class="fw-bold">1. Crie Serviços</h5>
+                    <p class="text-muted">Cadastre os serviços que deseja oferecer.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="p-3">
+                    <i class="fas fa-calendar-alt fa-2x text-success mb-2"></i>
+                    <h5 class="fw-bold">2. Defina Horários</h5>
+                    <p class="text-muted">Configure os horários disponíveis.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="p-3">
+                    <i class="fas fa-user-check fa-2x text-info mb-2"></i>
+                    <h5 class="fw-bold">3. Agendamentos</h5>
+                    <p class="text-muted">Seus clientes podem reservar um horário.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,215 @@
+{% extends 'base.html' %}
+{% load user_tags %}
+
+{% block content %}
+<div class="container mt-5">
+    <meta name="csrf-token" content="{{ csrf_token }}">
+
+    <div class="card shadow">
+        <div class="card-header bg-info text-white">
+            <h4 class="mb-0">Detalhes do Agendamento</h4>
+        </div>
+
+        <div class="card-body">
+            {% if user|has_role:'admin,secretary,interviewer' %}
+            <div class="form-check form-switch mb-3">
+                <input class="form-check-input" type="checkbox" id="attendanceSwitch" {% if object.compareceu %}checked{% endif %} data-appointment-id="{{ object.id }}">
+                <label class="form-check-label" for="attendanceSwitch">Cliente Compareceu</label>
+            </div>
+            {% endif %}
+
+            <p><strong>Cliente:</strong> {{ object.cliente.username }}</p>
+            <p><strong>Serviço:</strong> {{ object.servico }}</p>
+            <p><strong>Horário:</strong> {{ object.horario }}</p>
+            <p><strong>Data do Agendamento:</strong> {{ object.data_agendamento|date:"d/m/Y" }}</p>
+            <p><strong>Senha:</strong> {{ object.senha }}</p>
+            <hr>
+
+            <h5 class="text-muted">Documentos Enviados</h5>
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <strong>RG Frente:</strong>
+                    {% if object.rg_frente %}
+                        <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#rgFrenteModal">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <!-- Modal -->
+                        <div class="modal fade" id="rgFrenteModal" tabindex="-1" aria-labelledby="rgFrenteModalLabel" aria-hidden="true">
+                            <div class="modal-dialog modal-lg modal-dialog-centered">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="rgFrenteModalLabel">RG Frente</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <img src="{{ object.rg_frente.url }}" class="img-fluid" alt="RG Frente">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% else %}
+                        <span class="text-danger">Não enviado</span>
+                    {% endif %}
+                </div>
+                <div class="col-md-4 mb-3">
+                    <strong>RG Verso:</strong>
+                    {% if object.rg_verso %}
+                        <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#rgVersoModal">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <!-- Modal -->
+                        <div class="modal fade" id="rgVersoModal" tabindex="-1" aria-labelledby="rgVersoModalLabel" aria-hidden="true">
+                            <div class="modal-dialog modal-lg modal-dialog-centered">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="rgVersoModalLabel">RG Verso</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <img src="{{ object.rg_verso.url }}" class="img-fluid" alt="RG Verso">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% else %}
+                        <span class="text-danger">Não enviado</span>
+                    {% endif %}
+                </div>
+                <div class="col-md-4 mb-3">
+                    <strong>CPF Documento:</strong>
+                    {% if object.cpf_documento %}
+                        <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#cpfDocumentoModal">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <!-- Modal -->
+                        <div class="modal fade" id="cpfDocumentoModal" tabindex="-1" aria-labelledby="cpfDocumentoModalLabel" aria-hidden="true">
+                            <div class="modal-dialog modal-lg modal-dialog-centered">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="cpfDocumentoModalLabel">CPF Documento</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <img src="{{ object.cpf_documento.url }}" class="img-fluid" alt="CPF Documento">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% else %}
+                        <span class="text-danger">Não enviado</span>
+                    {% endif %}
+                </div>
+                <div class="col-md-4 mb-3">
+                    <strong>Certidão de Casamento:</strong>
+                    {% if object.certidao_casamento %}
+                        <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#certidaoCasamentoModal">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <!-- Modal -->
+                        <div class="modal fade" id="certidaoCasamentoModal" tabindex="-1" aria-labelledby="certidaoCasamentoModalLabel" aria-hidden="true">
+                            <div class="modal-dialog modal-lg modal-dialog-centered">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="certidaoCasamentoModalLabel">Certidão de Casamento</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <img src="{{ object.certidao_casamento.url }}" class="img-fluid" alt="Certidão de Casamento">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% else %}
+                        <span class="text-danger">Não enviado</span>
+                    {% endif %}
+                </div>
+                <div class="col-md-4 mb-3">
+                    <strong>Comprovante de Residência:</strong>
+                    {% if object.comprovante_residencia %}
+                        <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#comprovanteResidenciaModal">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <!-- Modal -->
+                        <div class="modal fade" id="comprovanteResidenciaModal" tabindex="-1" aria-labelledby="comprovanteResidenciaModalLabel" aria-hidden="true">
+                            <div class="modal-dialog modal-lg modal-dialog-centered">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="comprovanteResidenciaModalLabel">Comprovante de Residência</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <img src="{{ object.comprovante_residencia.url }}" class="img-fluid" alt="Comprovante de Residência">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% else %}
+                        <span class="text-danger">Não enviado</span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="mt-4 text-end">
+                {% if user|has_role:'admin,secretary,interviewer' %}
+                <a href="{% url 'dashboard_home' %}" class="btn btn-primary">Voltar para Dashboard</a>
+                {% else %}
+                <a href="{% url 'agendar_list' %}" class="btn btn-secondary">Voltar</a>
+                {% endif %}
+            </div>
+            
+        </div>
+    </div>
+</div>
+
+<script>
+
+function getCSRFToken() {
+    return document.querySelector('meta[name="csrf-token"]')?.content || '';
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    document.body.addEventListener('change', function(event) {
+        if (event.target && event.target.matches('#attendanceSwitch')) {
+            console.log('🟢 Switch detectado:', event.target);
+
+            const attendanceSwitch = event.target;
+            const appointmentId = attendanceSwitch.dataset.appointmentId;  // Verifica se o ID existe
+            const attended = attendanceSwitch.checked;
+
+            if (!appointmentId) {
+                console.error('❌ ERRO: `data-appointment-id` não encontrado no switch.');
+                return;
+            }
+
+            console.log(`🔄 Enviando requisição para /api/appointments/${appointmentId}/attendance/`);
+            
+            fetch(`/api/appointments/${appointmentId}/attendance/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCSRFToken()
+                },
+                body: JSON.stringify({ compareceu: attended })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    console.log('✅ Status atualizado com sucesso!');
+                    alert('Status de comparecimento atualizado com sucesso!');
+                } else {
+                    console.error('❌ Erro na resposta do servidor:', data);
+                    alert('Erro ao atualizar status de comparecimento');
+                    attendanceSwitch.checked = !attended; // Reverte o switch
+                }
+            })
+            .catch(error => {
+                console.error('❌ ERRO no fetch:', error);
+                alert('Erro ao atualizar status de comparecimento');
+                attendanceSwitch.checked = !attended; // Reverte o switch
+            });
+        }
+    });
+});
+
+</script>
+{% endblock %}

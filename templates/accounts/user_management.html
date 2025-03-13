@@ -1,0 +1,236 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4 text-primary fw-bold">Gerenciamento de Usuários</h2>
+    
+    {% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Add New User Button -->
+    <div class="mb-4">
+        <button type="button" class="btn btn-primary rounded-pill shadow-sm" data-bs-toggle="modal" data-bs-target="#addUserModal" style="transition: all 0.3s ease-in-out; background-color: #4361ee;">
+            <i class="fas fa-user-plus me-2"></i> Adicionar Novo Usuário
+        </button>
+    </div>
+
+    <!-- Add User Modal -->
+    <div class="modal fade" id="addUserModal" tabindex="-1" aria-labelledby="addUserModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addUserModalLabel">Adicionar Novo Usuário</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form method="post" action="{% url 'user_management' %}">
+                    {% csrf_token %}
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Usuário</label>
+                            <input type="text" class="form-control" id="username" name="username" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email" name="email" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Senha Padrão</label>
+                            <input type="password" class="form-control" id="password" name="password" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="role" class="form-label">Perfil</label>
+                            <select class="form-select" id="role" name="role" required>
+                                {% for role_value, role_name in role_choices %}
+                                <option value="{{ role_value }}">{{ role_name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <input type="hidden" name="action" value="add_user">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Adicionar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Users Table -->
+    <div class="table-responsive">
+        <table class="table table-hover shadow-sm rounded overflow-hidden">
+            <thead class="bg-light" style="background-color: #f8f9fa;">
+                <tr>
+                    <th>Avatar</th>
+                    <th>Usuário</th>
+                    <th>Email</th>
+                    <th>Telefone</th>
+                    <th>Data de Criação</th>
+                    <th>Perfil</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for profile in profiles %}
+                <tr>
+                    <td class="align-middle" style="width: 60px;">
+                        {% if profile.avatar %}
+                        <img src="{{ profile.avatar.url }}" alt="Avatar" class="rounded-circle" style="width: 40px; height: 40px; object-fit: cover;">
+                        {% else %}
+                        <img src="{% static 'images/default-avatar.png' %}" alt="Default Avatar" class="rounded-circle" style="width: 40px; height: 40px; object-fit: cover;">
+                        {% endif %}
+                    </td>
+                    <td class="align-middle">{{ profile.user.username }}</td>
+                    <td class="align-middle">{{ profile.user.email }}</td>
+                    <td class="align-middle">{{ profile.phone|default:"Não informado" }}</td>
+                    <td class="align-middle">{{ profile.created_at|date:"d/m/Y" }}</td>
+                    <td class="align-middle">
+                        <form method="post" action="{% url 'user_management' %}" class="m-0">
+                            {% csrf_token %}
+                            <input type="hidden" name="user_id" value="{{ profile.user.id }}">
+                            <select name="role" id="role_{{ profile.user.id }}" class="form-select form-select-sm rounded-pill" style="border-color: #dee2e6; background-color: #f8f9fa;" {% if profile.user == request.user %}disabled{% endif %}>
+                                {% for role_value, role_name in role_choices %}
+                                <option value="{{ role_value }}" {% if profile.role == role_value %}selected{% endif %}>{{ role_name }}</option>
+                                {% endfor %}
+                            </select>
+                    </td>
+                    <td class="align-middle">
+                        {% if profile.user != request.user %}
+                        <form method="post" action="{% url 'user_management' %}" class="d-inline m-0">
+                            {% csrf_token %}
+                            <input type="hidden" name="user_id" value="{{ profile.user.id }}">
+                            <button type="submit" class="btn btn-primary btn-sm rounded-circle" style="width: 32px; height: 32px; padding: 0; line-height: 32px;">
+                                <i class="fas fa-save"></i>
+                            </button>
+                        </form>
+                        <button type="button" class="btn btn-danger btn-sm rounded-circle ms-1" style="width: 32px; height: 32px; padding: 0; line-height: 32px;" onclick="confirmDelete('{{ profile.user.id }}')">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                        {% endif %}
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination -->
+    <nav aria-label="Page navigation" class="mt-4">
+        <ul class="pagination justify-content-center">
+            {% if profiles.has_previous %}
+            <li class="page-item">
+                <a class="page-link rounded-circle mx-1" href="?page={{ profiles.previous_page_number }}" aria-label="Previous">
+                    <i class="fas fa-chevron-left"></i>
+                </a>
+            </li>
+            {% endif %}
+
+            {% for num in profiles.paginator.page_range %}
+            <li class="page-item {% if profiles.number == num %}active{% endif %}">
+                <a class="page-link rounded-circle mx-1" href="?page={{ num }}">{{ num }}</a>
+            </li>
+            {% endfor %}
+
+            {% if profiles.has_next %}
+            <li class="page-item">
+                <a class="page-link rounded-circle mx-1" href="?page={{ profiles.next_page_number }}" aria-label="Next">
+                    <i class="fas fa-chevron-right"></i>
+                </a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+</div>
+
+<style>
+    .btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 2px 4px rgba(67, 97, 238, 0.15);
+    }
+    .table-hover tbody tr:hover {
+        background-color: rgba(67, 97, 238, 0.02);
+        transition: all 0.2s ease-in-out;
+    }
+    .form-select:focus {
+        border-color: #4361ee;
+        box-shadow: 0 0 0 0.25rem rgba(67, 97, 238, 0.25);
+    }
+    .rounded-pill {
+        padding-left: 1.5rem;
+        padding-right: 1.5rem;
+    }
+    .table thead th {
+        border-top: none;
+        font-weight: 600;
+        color: #495057;
+    }
+    .table td {
+        vertical-align: middle;
+        color: #6c757d;
+    }
+    .page-link {
+        color: #4361ee;
+        border: 1px solid #4361ee;
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+    }
+    .page-link:hover {
+        background-color: #4361ee;
+        color: white;
+    }
+    .page-item.active .page-link {
+        background-color: #4361ee;
+        border-color: #4361ee;
+    }
+    .modal.fade .modal-dialog {
+        transform: translate(0, -50px);
+        transition: transform 0.3s ease-out;
+    }
+    .modal.show .modal-dialog {
+        transform: none;
+    }
+    .modal-content {
+        border-radius: 0.5rem;
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    }
+</style>
+
+
+<script>
+function confirmDelete(userId) {
+    if (confirm('Tem certeza que deseja excluir este usuário?')) {
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '{% url "user_management" %}';
+        
+        const csrfToken = document.createElement('input');
+        csrfToken.type = 'hidden';
+        csrfToken.name = 'csrfmiddlewaretoken';
+        csrfToken.value = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        
+        const userIdInput = document.createElement('input');
+        userIdInput.type = 'hidden';
+        userIdInput.name = 'delete_user_id';
+        userIdInput.value = userId;
+        
+        form.appendChild(csrfToken);
+        form.appendChild(userIdInput);
+        document.body.appendChild(form);
+        form.submit();
+    }
+}
+</script>
+{% endblock %}

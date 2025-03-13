@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <div class="card shadow-sm">
+        <div class="card-body text-center p-4">
+          <h2 class="card-title mb-4">Confirmar Cancelamento</h2>
+          <p class="card-text mb-4">Você tem certeza que deseja cancelar seu agendamento de "<strong>{{ object.cliente.username }}</strong>"?</p>
+          <form method="post" action="{% url 'agendar_cancel' agendamento.pk %}" class="d-flex justify-content-center gap-3">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-outline-danger">
+              <i class="bi bi-trash me-2"></i>Excluir
+            </button>
+            <a href="{% url 'agendar_list' %}" class="btn btn-outline-secondary">
+              <i class="bi bi-x-circle me-2"></i>Cancelar
+            </a>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.card {
+  transition: all 0.3s ease;
+  border: none;
+}
+
+.btn {
+  transition: all 0.2s ease;
+  padding: 0.5rem 1.5rem;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.btn-outline-danger:hover {
+  background-color: #dc3545;
+  color: white;
+}
+
+.btn-outline-secondary:hover {
+  background-color: #6c757d;
+  color: white;
+}
+</style>
+{% endblock %}
