@@ -25,6 +25,7 @@
               </div>
               {% endfor %}
               <div class="d-grid gap-2 mt-4">
+                <input type="hidden" name="agendamentoData" id="agendamentoData">
                 <button type="submit" class="btn btn-primary btn-lg rounded-3">Entrar</button>
               </div>
             </form>
@@ -37,4 +38,17 @@
     </div>
   </div>
 </div>
+
+{% block extra_js %}
+<script>
+  // Verifica se existe a chave no localStorage e adiciona ao campo oculto
+  document.addEventListener("DOMContentLoaded", function () {
+      const agendamentoData = localStorage.getItem("agendamentoData");
+      if (agendamentoData) {
+          document.getElementById("agendamentoData").value = agendamentoData;
+          console.log("Chave encontrada no localStorage:", agendamentoData);
+      }
+  });
+</script>
+{% endblock %}
 {% endblock %}

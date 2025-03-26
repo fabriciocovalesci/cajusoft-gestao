@@ -6,103 +6,221 @@
     <div class="col-md-8">
       <div class="card shadow-sm">
         <div class="card-header bg-primary text-white p-3">
-          <h2 class="card-title mb-0">
+          <h3 class="card-title mb-0">
             <i class="bi {% if form.instance.pk %}bi-pencil-square{% else %}bi-plus-circle{% endif %} me-2"></i>
             {% if form.instance.pk %}Editar Agendamento{% else %}Criar Novo Agendamento{% endif %}
-          </h2>
+          </h3>
         </div>
         <div class="card-body p-4">
           <form method="post" class="needs-validation" novalidate>
             {% csrf_token %}
+        
             {% for field in form %}
-            <div class="form-floating mb-3">
-              {{ field }}
-              <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-              {% if field.errors %}
-              <div class="invalid-feedback d-block">
-                {{ field.errors|join:", " }}
-              </div>
-              {% endif %}
-              {% if field.help_text %}
-              <div class="form-text text-muted">
-                {{ field.help_text }}
-              </div>
-              {% endif %}
-            </div>
+
+                <div class="form-floating mb-3">
+
+                    {% if field.name == 'servico' %}
+                        {{ field }} 
+                        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                        
+                    {% elif field.name == 'atributo' %}
+                        {% if form.servico.value != 'Cadastro Único' %}
+                            {{ field }} 
+                            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                        {% endif %}
+        
+                    {% elif field.field.widget.input_type == 'checkbox' %}
+                        <div class="form-check">
+                            {{ field }}  <!-- Renderiza o checkbox -->
+                            <label for="{{ field.id_for_label }}" class="form-check-label" style="margin-left: 10px;">Atendimento Prioritário(a)</label>
+                            <br>
+                            <span class="form-text text-muted">somente para Casa do Cidadão</span>
+                        </div>
+        
+                    {% else %}
+                        {{ field }}  <!-- Renderiza outros campos -->
+                        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {% endif %}
+        
+                    {% if field.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ field.errors|join:", " }}
+                        </div>
+                    {% endif %}
+                    {% if field.help_text %}
+                        <div class="form-text text-muted">
+                            {{ field.help_text }}
+                        </div>
+                    {% endif %}
+                </div>
             {% endfor %}
+        
             <div class="d-flex justify-content-end gap-2 mt-4">
-              <a href="{% url 'agendamento_list' %}" class="btn btn-outline-secondary">
-                <i class="bi bi-arrow-left me-2"></i>Voltar
-              </a>
-              <button type="submit" class="btn btn-primary">
-                <i class="bi bi-check2-circle me-2"></i>Salvar
-              </button>
+                <a href="{% url 'agendamento:agendamento_list' %}" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left me-2"></i>Voltar
+                </a>
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-check2-circle me-2"></i>Salvar
+                </button>
             </div>
-          </form>
+        </form>
+        
+
         </div>
+
+        {% if messages %}
+        <div class="toast-container position-fixed bottom-0 end-0 p-3">
+          {% for message in messages %}
+          <div
+            class="toast align-items-center text-white bg-{% if message.tags == 'success' %}success{% else %}danger{% endif %} border-0 show"
+            role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+              <div class="toast-body">
+                {{ message }}
+              </div>
+              <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
+                aria-label="Close"></button>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        {% endif %}
       </div>
     </div>
   </div>
 </div>
 
 <style>
-.form-floating > .form-control,
-.form-floating > .form-select {
-  height: calc(3.5rem + 2px);
-  line-height: 1.25;
-}
+  .form-floating>.form-control,
+  .form-floating>.form-select {
+    height: calc(3.5rem + 2px);
+    line-height: 1.25;
+  }
 
-.form-floating > label {
-  padding: 1rem 0.75rem;
-}
+  .form-floating>label {
+    padding: 1rem 0.75rem;
+  }
 
-.card {
-  transition: box-shadow 0.3s ease;
-}
+  .card {
+    transition: box-shadow 0.3s ease;
+  }
 
-.card:hover {
-  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
-}
+  .card:hover {
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+  }
 
-.btn {
-  transition: all 0.2s ease;
-}
+  .btn {
+    transition: all 0.2s ease;
+  }
 
-.btn:hover {
-  transform: translateY(-1px);
-}
+  .btn:hover {
+    transform: translateY(-1px);
+  }
 
-.btn-primary {
-  background-color: #0d6efd;
-  border-color: #0d6efd;
-}
+  .btn-primary {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+  }
 
-.btn-primary:hover {
-  background-color: #0b5ed7;
-  border-color: #0a58ca;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
+  .btn-primary:hover {
+    background-color: #0b5ed7;
+    border-color: #0a58ca;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
 
-.invalid-feedback {
-  font-size: 0.875rem;
-  color: #dc3545;
-  margin-top: 0.25rem;
-}
+  .invalid-feedback {
+    font-size: 0.875rem;
+    color: #dc3545;
+    margin-top: 0.25rem;
+  }
 </style>
 
 <script>
-// Form validation
-document.addEventListener('DOMContentLoaded', function() {
-  const forms = document.querySelectorAll('.needs-validation');
-  Array.from(forms).forEach(form => {
-    form.addEventListener('submit', event => {
-      if (!form.checkValidity()) {
-        event.preventDefault();
-        event.stopPropagation();
-      }
-      form.classList.add('was-validated');
-    }, false);
+  // Form validation
+  document.addEventListener('DOMContentLoaded', function () {
+    const forms = document.querySelectorAll('.needs-validation');
+    Array.from(forms).forEach(form => {
+      form.addEventListener('submit', event => {
+        if (!form.checkValidity()) {
+          event.preventDefault();
+          event.stopPropagation();
+        }
+        form.classList.add('was-validated');
+      }, false);
+    });
+
+
+    var toastElList = [].slice.call(document.querySelectorAll('.toast'));
+    var toastList = toastElList.map(function (toastEl) {
+      return new bootstrap.Toast(toastEl);
+    });
+    toastList.forEach(toast => toast.show());
+
   });
+
+
+  document.addEventListener('DOMContentLoaded', function () {
+    const servicoSelect = document.querySelector('#id_servico');
+    const atributoSelect = document.querySelector('#id_atributo');
+    const atributoLabel = document.querySelector('label[for="id_atributo"]'); // Seleciona a label correspondente
+    const prioritarioCheckbox = document.querySelector('#id_prioritario'); // Seleciona o checkbox
+    const prioritarioLabel = document.querySelector('label[for="id_prioritario"]'); // Seleciona a label do checkbox
+    const prioritarioHelpText = document.querySelector('#prioritarioHelp'); // Seleciona o texto de ajuda do checkbox
+
+    // Oculta o select de atributos e a label, e o checkbox inicialmente, se necessário
+    atributoSelect.style.display = 'none';
+    atributoLabel.style.display = 'none'; // Oculta a label do atributo
+    prioritarioCheckbox.parentElement.style.display = 'none'; // Oculta o checkbox e sua label
+
+    servicoSelect.addEventListener('change', function () {
+        const servicoId = servicoSelect.value;
+
+        // Chamada para obter atributos do serviço selecionado
+        fetch(`/agendamentos/get_atributos/${servicoId}/`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                atributoSelect.innerHTML = '';
+
+                if (data.service_name === 'Cadastro Único') {
+                    atributoSelect.style.display = 'none';
+                    atributoLabel.style.display = 'none';
+                    prioritarioCheckbox.parentElement.style.display = 'none';
+                } else if (data.service_name === 'Casa do Cidadão') {
+                    prioritarioCheckbox.parentElement.style.display = 'block';
+                    atributoSelect.style.display = 'block';
+                    atributoLabel.style.display = 'block';
+
+                    data.atributos.forEach(function (atributo) {
+                        const option = document.createElement('option');
+                        option.value = atributo;
+                        option.textContent = atributo;
+                        atributoSelect.appendChild(option);
+                    });
+                } else {
+                    atributoSelect.style.display = 'block';
+                    atributoLabel.style.display = 'block';
+                    prioritarioCheckbox.parentElement.style.display = 'none';
+
+                    data.atributos.forEach(function (atributo) {
+                        const option = document.createElement('option');
+                        option.value = atributo;
+                        option.textContent = atributo;
+                        atributoSelect.appendChild(option);
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('There was a problem with the fetch operation:', error);
+            });
+    });
 });
+
+
+
 </script>
 {% endblock %}

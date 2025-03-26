@@ -26,6 +26,8 @@ SECRET_KEY = 'django-insecure-1baqsa=s=x8$pi6o!d1^kng$1ecp!ggvd+eb#wk8-pau6j#req
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+
+
 ALLOWED_HOSTS = ['3.84.84.63', 'localhost', '127.0.0.1']
 
 
@@ -40,9 +42,11 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'servicos',
+    'agendamento',
     'accounts',
     'crispy_forms',
     'crispy_bootstrap5',
+    'webhooks'
 ]
 
 INSTALLED_APPS += ["storages"] 
@@ -131,11 +135,14 @@ USE_TZ = False
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-STATIC_URL = '/static/'  # Deve ter a barra inicial
-STATIC_ROOT = BASE_DIR / 'staticfiles'  # Onde os arquivos estáticos serão coletados
+STATIC_URL = '/static/'
+
+STATIC_URL = '/static/'
 STATICFILES_DIRS = [
-    BASE_DIR / 'static',  # Diretório onde você coloca os arquivos estáticos adicionais
+    os.path.join(BASE_DIR, 'static')
 ]
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
 
 # Media files
 MEDIA_URL = 'media/'
@@ -184,3 +191,6 @@ AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
 AWS_SES_REGION_NAME = os.getenv("AWS_SES_REGION_NAME", "us-east-1") 
 AWS_SES_REGION_ENDPOINT = f"email-smtp.{AWS_SES_REGION_NAME}.amazonaws.com"
 DEFAULT_FROM_EMAIL = 'smartflowai3@gmail.com'
+
+MAILJET_API_KEY=os.getenv("MAILJET_API_KEY")
+MAILJET_SECRET_KEY=os.getenv("MAILJET_SECRET_KEY")

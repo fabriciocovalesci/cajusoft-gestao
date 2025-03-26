@@ -6,7 +6,8 @@ from django.utils import timezone
 from django.core.mail import send_mail
 import boto3
 from botocore.exceptions import BotoCoreError, ClientError
-
+from mailjet_rest import Client
+from core import settings
 
 def generate_random_password(length=6):
     """Generate a random password with specified length."""
@@ -18,7 +19,7 @@ def get_appointment_email_template(agendamento):
     return f"""
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
         <h2 style="color: #333;">Confirmação de Agendamento</h2>
-        <p>Olá {agendamento.get('user')},</p>
+        <p>Olá {agendamento.get('nome')},</p>
         <p>Seu agendamento foi confirmado com sucesso!</p>
         
         <div style="background-color: #f5f5f5; padding: 15px; border-radius: 5px; margin: 20px 0;">
@@ -41,7 +42,7 @@ def get_cancellation_email_template(agendamento):
     return f"""
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
         <h2 style="color: #333;">Cancelamento de Agendamento</h2>
-        <p>Olá {agendamento.get('user')},</p>
+        <p>Olá {agendamento.get('nome')},</p>
         <p>Seu agendamento foi cancelado conforme solicitado.</p>
         
         <div style="background-color: #f5f5f5; padding: 15px; border-radius: 5px; margin: 20px 0;">
@@ -159,4 +160,49 @@ def get_status_badge(ag):
         return {"status": "Compareceu", "badge": "text-bg-success"}
     if ag.confirmado:
         return {"status": "Confirmado", "badge": "text-bg-info"}
+    if ag.agendado:
+        return {"status": "Agendado", "badge": "text-bg-info"}
     return {"status": "Pendente", "badge": "text-bg-primary"}
+
+
+
+
+
+def send_appointment_email_mainjet(agendamento, template_type='confirmation'):
+    try:
+        print("agendamento", agendamento )
+        if template_type == 'confirmation':
+            html_content = get_appointment_email_template(agendamento)
+            subject = 'Confirmação de Agendamento'
+        else:
+            html_content = get_cancellation_email_template(agendamento)
+            subject = 'Cancelamento de Agendamento'
+        mailjet = Client(auth=(settings.MAILJET_API_KEY, settings.MAILJET_SECRET_KEY), version='v3.1')
+        data = {
+            'Messages': [
+                {
+                "From": {
+                    "Email": 'smartflowai3@gmail.com',
+                    "Name": "Hora Marcada Pacajus-CE"
+                },
+                "To": [
+                    {
+                    "Email": agendamento.get('email'),
+                    "Name": "You"
+                    }
+                ],
+                "Subject": subject,
+                "TextPart": "Greetings from Mailjet!",
+                "HTMLPart": html_content
+                }
+            ]
+            }
+        response = mailjet.send.create(data=data)
+        if response.status_code == 200:
+            print("Email enviado com sucesso")
+        else:
+            return False
+        return True
+    except Exception as e:
+        print(f"Error sending email: {e}")
+        return False

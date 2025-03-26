@@ -4,6 +4,30 @@ from django.contrib.auth.models import User
 from accounts.models import UserProfile
 
 class RegisterForm(forms.ModelForm):
+    cpf = forms.CharField(
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Digite seu CPF (somente números)'
+        }),
+        label="CPF"
+    )
+      
+    phone_person = forms.CharField(
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Telefone (DD) 99999-9999'
+        }),
+        label="Telefone pessoal Whatsapp"
+    )
+
+    phone_contact = forms.CharField(
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Telefone para contato (DD) 99999-9999'
+        }),
+        label="Telefone para contato"
+    )
+        
     password = forms.CharField(
         widget=forms.PasswordInput(attrs={
             'class': 'form-control',
@@ -20,11 +44,11 @@ class RegisterForm(forms.ModelForm):
 
     class Meta:
         model = User
-        fields = ['username', 'email', 'password']
+        fields = ['username', 'email', 'phone_person', 'phone_contact', 'cpf', 'password']
         widgets = {
             'username': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': 'Nome de usuário'
+                'placeholder': 'Nome'
             }),
             'email': forms.EmailInput(attrs={
                 'class': 'form-control',
@@ -49,6 +73,16 @@ class RegisterForm(forms.ModelForm):
             raise forms.ValidationError("Este nome de usuário já está em uso.")
 
         return cleaned_data
+    
+    # def save(self, commit=True):
+    #     user = super().save(commit=False)
+    #     user.set_password(self.cleaned_data["password"])
+
+    #     if commit:
+    #         user.save()
+    #         UserProfile.objects.create(user=user)
+
+    #     return user
 
 
 
@@ -107,7 +141,7 @@ class UserProfileForm(forms.ModelForm):
 
     class Meta:
         model = UserProfile
-        fields = ['first_name', 'email', 'phone', 'cpf', 'role']
+        fields = ['first_name', 'email', 'phone_person', 'phone_contact', 'cpf', 'role']
         widgets = {
             # 'avatar': forms.ClearableFileInput(attrs={
             #     'class': 'form-control'
@@ -116,7 +150,11 @@ class UserProfileForm(forms.ModelForm):
                 'class': 'form-control',
                 'placeholder': 'Nome'
             }),
-            'phone': forms.TextInput(attrs={
+            'phone_person': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Telefone'
+            }),
+            'phone_contact': forms.TextInput(attrs={
                 'class': 'form-control',
                 'placeholder': 'Telefone'
             }),

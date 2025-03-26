@@ -6,12 +6,18 @@ from django.contrib.auth import update_session_auth_hash
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.contrib.auth.models import User
+import requests
 from accounts.models import UserProfile
+from core import settings
 from .forms import LoginForm, RegisterForm, UserProfileForm
 from django.contrib.auth import logout
 from django.contrib import messages
 from django.contrib.auth.decorators import user_passes_test
-
+from django.shortcuts import render, redirect
+from django.contrib.auth import login
+from django.contrib import messages
+from .forms import RegisterForm
+from .models import UserProfile  # Certifique-se de que está importando o UserProfile
 
 def can_manage_users(user):
     return hasattr(user, 'userprofile') and user.userprofile.role in ['admin', 'secretary', 'interviewer']
@@ -70,46 +76,59 @@ def user_management(request):
     })
 
 
-@receiver(post_save, sender=User)
-def create_user_profile(sender, instance, created, **kwargs):
-    if created:
-        UserProfile.objects.get_or_create(user=instance)  
-
-
-@receiver(post_save, sender=User)
-def save_user_profile(sender, instance, **kwargs):
-    instance.userprofile.save()
-
 
 def register_view(request):
     if request.method == "POST":
         form = RegisterForm(request.POST)
         if form.is_valid():
+            # Criação do usuário
             user = form.save(commit=False)
             user.set_password(form.cleaned_data["password"])
             user.save()
+
+            print("Dados do formulário:", form.cleaned_data)
+
+            user_profile, created = UserProfile.objects.get_or_create(user=user)
+            user_profile.phone_person = form.cleaned_data.get("phone_person", "")
+            user_profile.phone_contact = form.cleaned_data.get("phone_contact", "")
+            user_profile.cpf = form.cleaned_data.get("cpf", "")
+            user_profile.first_name = form.cleaned_data.get("username", "")
+            user_profile.role = "client"
+            user_profile.save()
+
+            if created:
+                print("UserProfile criado automaticamente.")
+            else:
+                print("UserProfile atualizado.")
+
+            print("UserProfile após a atualização:", user_profile.__dict__)
+
             login(request, user)
-            return redirect("agendamento_list")
+            messages.success(request, "Cadastro realizado com sucesso.")
+            return redirect("agendamento:agendamento_list")
     else:
         form = RegisterForm()
+
     return render(request, "accounts/register.html", {"form": form})
+
+
 
 def login_view(request):
     if request.method == "POST":
         email = request.POST.get('email')
         password = request.POST.get('password')
         try:
-            # Try to get a unique user by email
+
             user = User.objects.filter(email=email).first()
             if user is None:
                 messages.error(request, "Email não encontrado.")
                 return render(request, "accounts/login.html", {"form": LoginForm()})
-            
+        
             # Authenticate user with username and password
             authenticated_user = authenticate(request, username=user.username, password=password)
             if authenticated_user is not None:
                 login(request, authenticated_user)
-                return redirect("agendamento_list")
+                return redirect("agendamento:agendamento_list")
             else:
                 messages.error(request, "Senha incorreta.")
         except Exception as e:
@@ -135,11 +154,27 @@ def password_change_view(request):
 @login_required
 def profile_view(request):
     profile, created = UserProfile.objects.get_or_create(user=request.user)
+    print("+++++++++++++++++++++++ ", request.user)
+        # Exibindo informações do usuário
+    print("+++++++++++++++++++++++ User Info +++++++++++++++++++++++")
+    print("Username:", request.user.username)
+    print("Email:", request.user.email)
+    
+    # Exibindo informações do UserProfile
+    print("+++++++++++++++++++++++ Profile Info +++++++++++++++++++++++")
+    print("UserProfile ID:", profile.id)
+    print("User ID:", profile.user_id)
+    print("Role:", profile.role)
+    print("Phone Person:", profile.phone_person)
+    print("Phone Contact:", profile.phone_contact)
+    print("CPF:", profile.cpf)
+    print("Created At:", profile.created_at)
+    print("Updated At:", profile.updated_at)
     if request.method == "POST":
         form = UserProfileForm(request.POST, request.FILES, instance=profile)
         if form.is_valid():
             form.save()
-            return redirect("profile")
+            return redirect("agendamento:agendamento_list")
     else:
         form = UserProfileForm(instance=profile)
     return render(request, "accounts/profile.html", {"form": form, "profile": profile})

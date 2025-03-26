@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
 {% block content %}
-<div class="main-content">
+<!-- <div class="main-content"> -->
   <div class="container">
     <div class="row justify-content-center">
       <div class="col-md-6 col-lg-5">
@@ -9,7 +9,7 @@
           <div class="card-body p-4">
             <div class="text-center mb-4">
               <!-- <img src="{% static 'images/hora-marcada.png' %}" alt="Logo" class="img-fluid mb-3" style="max-width: 150px;"> -->
-              <h2 class="fw-bold text-primary mb-2">Cadastro</h2>
+              <h4 class="fw-bold text-primary mb-2">Cadastro</h4>
               <p class="text-muted small mb-4">Atendimento sem fila, com apenas um clique</p>
             </div>
             <form method="post" class="needs-validation" novalidate>
@@ -26,6 +26,7 @@
               </div>
               {% endfor %}
               <div class="d-grid gap-2 mt-4">
+                <input type="hidden" name="agendamentoData" id="agendamentoData">
                 <button type="submit" class="btn btn-primary btn-lg rounded-3">Registrar</button>
               </div>
             </form>
@@ -37,5 +38,18 @@
       </div>
     </div>
   </div>
-</div>
+<!-- </div> -->
+
+{% block extra_js %}
+<script>
+  // Verifica se existe a chave no localStorage e adiciona ao campo oculto
+  document.addEventListener("DOMContentLoaded", function () {
+      const agendamentoData = localStorage.getItem("agendamentoData");
+      if (agendamentoData) {
+          document.getElementById("agendamentoData").value = agendamentoData;
+          console.log("Chave encontrada no localStorage:", agendamentoData);
+      }
+  });
+</script>
+{% endblock %}
 {% endblock %}

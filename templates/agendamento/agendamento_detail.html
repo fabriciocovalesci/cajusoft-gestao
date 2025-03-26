@@ -1,56 +1,61 @@
 {% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<!-- Adicione os estilos necessários para o calendário -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/fullcalendar.min.css">
+{% endblock %}
 
 {% block content %}
 <div class="container py-4">
   <div class="card shadow-sm">
     <div class="card-header bg-primary text-white">
-      <h2 class="mb-0 fs-3">Detalhes do Agendamento</h2>
+      <h2 class="mb-0 fs-3">Agendamento</h2>
     </div>
+    
     <div class="card-body">
-      <div class="row g-4">
-        <div class="col-md-6">
-          <div class="detail-item">
-            <label class="text-muted">Serviço</label>
-            <p class="fs-5 mb-3">{{ agendamento.servico }}</p>
+      <div class="row mb-4">
+        <div class="col-md-5">
+          <!-- Informações do Instituto -->
+          <div class="instituto-info mb-4">
+            <h4>{{ agendamento.servico }}</h4>
+            <p class="text-muted">Exclusivo para Idosos, Obesos, Gestantes, Deficientes, Lactantes, Pessoas com crianças de colo e doadores de sangue.</p>
+            <p class="text-muted small">(Comprovar a partir de documentos e/ou laudos o motivo de sua prioridade).</p>
           </div>
-          <div class="detail-item">
-            <label class="text-muted">Data</label>
-            <p class="fs-5 mb-3">{{ agendamento.data }}</p>
+          
+          <!-- Documentos necessários -->
+          <div class="documentos-info mb-4">
+            <h5>DOCUMENTOS A SE LEVAR NO DIA:</h5>
+            <ul class="list-unstyled small text-muted">
+              <li>- Certidão de Nascimento ou Casamento;</li>
+              <li>- Em caso de Divórcio: Averbação de Divórcio;</li>
+              <li>- Em caso de viuvez: Certidão de Casamento contendo o Óbito na mesma;</li>
+            </ul>
           </div>
-          <div class="detail-item">
-            <label class="text-muted">Vagas</label>
-            <p class="fs-5 mb-3">{{ agendamento.vagas }}</p>
-          </div>
+          
         </div>
-        <div class="col-md-6">
-          <div class="detail-item">
-            <label class="text-muted">Hora de Início</label>
-            <p class="fs-5 mb-3">{{ agendamento.hora_inicio }}</p>
+        
+        <div class="col-md-7">
+          <div class="calendario-container">
+            <h4 class="text-center mb-3">Selecione uma data e horário</h4>
+            
+       
+      
+            
+            <!-- Data selecionada -->
+            <div class="mt-4">
+              <h5 class="text-center" id="data-selecionada">Data Selecionada</h5>
+              <div class="row mt-3" id="horarios-container">
+              </div>
+              <button id="salvar-btn" class="btn btn-success mt-3">Salvar</button>
           </div>
-          <div class="detail-item">
-            <label class="text-muted">Hora de Fim</label>
-            <p class="fs-5 mb-3">{{ agendamento.hora_fim }}</p>
-          </div>
-          <div class="detail-item">
-            <label class="text-muted">Status</label>
-            <p class="fs-5 mb-3">{{ agendamento.get_status_display }}</p>
           </div>
         </div>
       </div>
-    </div>
-    <div class="card-footer bg-light d-flex justify-content-between align-items-center">
-      <a href="{% url 'agendamento_list' %}" class="btn btn-outline-primary">
-        <i class="bi bi-arrow-left me-1"></i>Voltar à lista
-      </a>
-      <div class="btn-group">
-        <a href="{% url 'agendamento_update' agendamento.id %}" class="btn btn-outline-secondary me-2">
-          <i class="bi bi-pencil-square me-1"></i>Editar
-        </a>
-        <a href="{% url 'agendamento_delete' agendamento.id %}" class="btn btn-outline-danger">
-          <i class="bi bi-trash3 me-1"></i>Deletar
-        </a>
-      </div>
-    </div>
+      
+ 
+    
+    
   </div>
 </div>
 
@@ -96,6 +101,40 @@
   border-radius: 0.25rem !important;
 }
 
+.calendario-wrapper {
+  border: 1px solid #e9ecef;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  background-color: #fff;
+}
+
+.calendario-wrapper .row .col {
+  text-align: center;
+  font-size: 0.85rem;
+}
+
+.btn-primary-subtle {
+  background-color: rgba(var(--bs-primary-rgb), 0.15);
+  border-color: rgba(var(--bs-primary-rgb), 0.15);
+  color: var(--bs-primary);
+}
+
+.btn-primary-subtle:hover {
+  background-color: rgba(var(--bs-primary-rgb), 0.25);
+  border-color: rgba(var(--bs-primary-rgb), 0.25);
+}
+
+.scrollable-menu {
+  height: auto;
+  max-height: 200px;
+  overflow-x: hidden;
+}
+
+.horario-btn.selected {
+  background-color: var(--bs-primary);
+  color: white;
+}
+
 @media (max-width: 768px) {
   .card-header {
     flex-direction: column;
@@ -112,6 +151,317 @@
   .btn-group .btn {
     flex: 1;
   }
+  
+  .calendario-wrapper .row .col {
+    padding: 0.1rem;
+  }
+  
+  .calendario-wrapper .btn {
+    padding: 0.25rem;
+    font-size: 0.75rem;
+  }
 }
 </style>
+
+{% block extra_js %}
+
+
+<script>
+     async function fetchAgendamentosDaSemana() {
+    try {
+        const response = await fetch('api/agendamentos-da-semana/');
+        return await response.json();
+      } catch (error) {
+        console.error('Erro ao buscar agendamentos da semana:', error);
+        return [];
+      }
+    }
+
+    async function fetchAgendamentosPorData(data) {
+      try {
+        const response = await fetch(`/api/agendamentos/${data}/`);
+        return await response.json();
+      } catch (error) {
+        console.error('Erro ao buscar agendamentos por data:', error);
+        return [];
+      }
+    }
+
+
+
+  document.addEventListener('DOMContentLoaded', function(e) {
+    e.preventDefault();
+    let horarioSelecionado = null;
+
+ 
+    // Prevenir a rolagem da página quando clicar nos botões
+    document.querySelectorAll('.calendario-wrapper button, .horario-btn').forEach(button => {
+      button.addEventListener('click', function(e) {
+        e.preventDefault();
+      });
+    });
+    
+    // Gerar o calendário para o mês atual
+    const currentDate = new Date();
+    const currentYear = 2025; // Fixado em 2025 conforme a imagem
+    const currentMonth = 3; // Março (1-12)
+    
+    generateCalendar(currentYear, currentMonth);
+    
+    // Função para gerar o calendário
+    async function generateCalendar(year, month) {
+      const firstDay = new Date(year, month - 1, 1);
+      const lastDay = new Date(year, month, 0);
+      const daysInMonth = lastDay.getDate();
+      const startDayOfWeek = firstDay.getDay();
+      
+      // Atualizar o dropdown do mês
+      document.getElementById('mesDropdown').textContent = getMonthName(month) + ' ' + year;
+      
+      // Limpar o container de semanas
+      const semanasContainer = document.getElementById('semanas-container');
+      semanasContainer.innerHTML = '';
+      
+      let dayCounter = 1;
+      let daysPrevMonth = new Date(year, month - 1, 0).getDate();
+      
+      // Calcular dias do mês anterior para preencher a primeira semana
+      const prevMonthDays = [];
+      for (let i = startDayOfWeek - 1; i >= 0; i--) {
+        prevMonthDays.push(daysPrevMonth - i);
+      }
+      
+      // Buscar agendamentos da semana
+      const agendamentos = await fetchAgendamentosDaSemana();
+      const diasAgendados = new Set(agendamentos.map(ag => ag.data)); // Conjunto com as datas agendadas
+
+      const dataAtual = new Date();
+        const diaAtual = dataAtual.toISOString().split('T')[0];
+
+      console.log(agendamentos);
+
+      const horariosContainer = document.getElementById('horarios-container'); // Crie um div com esse ID no HTML
+
+      // Limpa os horários existentes
+      horariosContainer.innerHTML = '';
+      agendamentos.forEach(agendamento => {
+            // Verifica se a data do agendamento corresponde à data selecionada
+            if (agendamento.data === diaAtual) { // Substitua pela data selecionada dinamicamente
+                agendamento.horarios_disponiveis.forEach(horario => {
+                    const button = document.createElement('button');
+                    if (horario.status){
+                    button.className = 'btn btn-outline-primary w-100 horario-btn';
+                    console.log(horario);
+                    button.setAttribute('data-horario', horario.hora_agenda
+                    );
+                    button.innerText = horario.hora_agenda;
+
+                    button.addEventListener('click', function() {
+                        // Remove a classe de selecionado de todos os botões
+                        const allButtons = document.querySelectorAll('.horario-btn');
+                        allButtons.forEach(btn => {
+                            btn.classList.remove('btn-primary'); // Remove a classe de botão selecionado
+                            btn.classList.add('btn-outline-primary'); // Adiciona a classe padrão
+                        });
+                        
+                        // Adiciona a classe de selecionado ao botão clicado
+                        button.classList.remove('btn-outline-primary');
+                        button.classList.add('btn-primary'); // Adiciona a classe de botão selecionado
+                    });
+
+                    // Adiciona o botão ao container
+                    const col = document.createElement('div');
+                    col.className = 'col-md-4 mb-2';
+                    col.appendChild(button);
+                    horariosContainer.appendChild(col);
+                    }
+                });
+            }
+        });
+
+      // Gerar semanas
+      let currentWeek = document.createElement('div');
+      currentWeek.className = 'row mb-2';
+      
+      // Adicionar dias do mês anterior
+      for (let i = 0; i < startDayOfWeek; i++) {
+        const dayCell = document.createElement('div');
+        dayCell.className = 'col p-1';
+        dayCell.innerHTML = `<button class="btn btn-light w-100 py-2 text-muted">${prevMonthDays[i]}</button>`;
+        currentWeek.appendChild(dayCell);
+      }
+      
+      // Adicionar dias do mês atual
+      for (let day = 1; day <= daysInMonth; day++) {
+        // Se for domingo e não for o primeiro dia, criar nova semana
+        if ((startDayOfWeek + day - 1) % 7 === 0 && day !== 1) {
+          semanasContainer.appendChild(currentWeek);
+          currentWeek = document.createElement('div');
+          currentWeek.className = 'row mb-2';
+        }
+        
+        const dayCell = document.createElement('div');
+        dayCell.className = 'col p-1';
+        
+        // Destacar o dia se tiver agendamentos
+        let buttonClass = 'btn btn-light';
+        const diaAtual = new Date(year, month - 1, day).toISOString().split('T')[0];
+        if (diasAgendados.has(diaAtual)) {
+          buttonClass = 'btn btn-success'; // Cor para destacar dias com agendamentos
+        }
+        
+        dayCell.innerHTML = `<button class="${buttonClass} w-100 py-2 dia-btn" data-day="${day}" data-data="${diaAtual}">${day}</button>`;
+        currentWeek.appendChild(dayCell);
+        
+        // Se for o último dia do mês
+        if (day === daysInMonth) {
+          // Preencher o resto da semana com dias do próximo mês
+          const remainingDays = 7 - ((startDayOfWeek + daysInMonth) % 7);
+          if (remainingDays < 7) {
+            for (let nextDay = 1; nextDay <= remainingDays; nextDay++) {
+              const nextDayCell = document.createElement('div');
+              nextDayCell.className = 'col p-1';
+              nextDayCell.innerHTML = `<button class="btn btn-light w-100 py-2 text-muted">${nextDay}</button>`;
+              currentWeek.appendChild(nextDayCell);
+            }
+          }
+        }
+      }
+      
+      // Adicionar a última semana
+      semanasContainer.appendChild(currentWeek);
+      
+      // Adicionar evento de clique aos botões dos dias
+      document.querySelectorAll('.dia-btn').forEach(btn => {
+        btn.addEventListener('click', async function(e) {
+          e.preventDefault();
+          
+          // Remover seleção anterior
+          document.querySelectorAll('.calendario-wrapper .btn-primary').forEach(b => {
+            if (b !== this && !b.classList.contains('horario-btn')) {
+              b.classList.remove('btn-primary', 'text-white');
+              b.classList.add('btn-light');
+            }
+          });
+          
+          // Selecionar botão atual
+          this.classList.remove('btn-light', 'btn-success');
+          this.classList.add('btn-primary', 'text-white');
+          
+          // Atualizar data selecionada
+          const dia = this.getAttribute('data-day');
+          const dataSelecionada = this.getAttribute('data-data');
+          console.log('Dia selecionado:', dia);
+          console.log('Mês selecionado:', month);
+          document.getElementById('data-selecionada').textContent = dia + ' de ' + getMonthName(month) + ' de ' + year;
+
+          // Buscar e exibir agendamentos para o dia selecionado
+          const agendamentosPorData = await fetchAgendamentosPorData(dataSelecionada);
+          exibirAgendamentos(agendamentosPorData);
+        });
+      });
+    }
+    
+    // Função para exibir agendamentos
+    function exibirAgendamentos(agendamentos) {
+      const agendamentosContainer = document.getElementById('agendamentos-container');
+      agendamentosContainer.innerHTML = ''; // Limpar agendamentos anteriores
+
+      if (agendamentos.length === 0) {
+        agendamentosContainer.innerHTML = '<p>Nenhum agendamento disponível para este dia.</p>';
+        return;
+      }
+
+      agendamentos.forEach(agendamento => {
+        const agendamentoItem = document.createElement('div');
+        agendamentoItem.className = 'agendamento-item';
+        agendamentoItem.innerHTML = `<strong>${agendamento.servico}</strong> - ${agendamento.hora_inicio} a ${agendamento.hora_fim}`;
+        agendamentosContainer.appendChild(agendamentoItem);
+      });
+    }
+    
+    // Função para obter o nome do mês
+    function getMonthName(month) {
+      const monthNames = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho',
+                         'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
+      return monthNames[month - 1];
+    }
+    
+    // Evento para troca de mês
+    document.querySelectorAll('.dropdown-menu .dropdown-item').forEach(item => {
+      item.addEventListener('click', function(e) {
+        e.preventDefault();
+        const selectedMonth = parseInt(this.getAttribute('data-month'));
+        console.log('Mês selecionado:', selectedMonth);
+        generateCalendar(2025, selectedMonth);
+      });
+    });
+    
+    // Evento para seleção de horário
+    document.querySelectorAll('.horario-btn').forEach(btn => {
+      btn.addEventListener('click', function(e) {
+        e.preventDefault();
+        
+        // Remover seleção anterior
+        document.querySelectorAll('.horario-btn').forEach(b => {
+          b.classList.remove('selected');
+        });
+        
+        // Marcar horário selecionado
+        this.classList.add('selected');
+        
+        // Aqui você pode adicionar código para salvar o horário selecionado
+        horarioSelecionado = this.getAttribute('data-horario');
+        console.log('Horário selecionado:', horarioSelecionado);
+      });
+    });
+
+    async function salvarAgendamento() {
+    const dataSelecionada = document.getElementById('data-selecionada').innerText; 
+    console.log(dataSelecionada, horarioSelecionado);
+
+    // if (!horarioSelecionado) {
+    //     alert('Por favor, selecione um horário antes de salvar.');
+    //     return;
+    // }
+
+    // // Exemplo de payload para salvar o agendamento
+    // const payload = {
+    //     data: dataSelecionada, // Data selecionada
+    //     horario: horarioSelecionado // Horário selecionado
+    // };
+
+    // try {
+    //     const response = await fetch('/api/agendar/', {
+    //         method: 'POST',
+    //         headers: {
+    //             'Content-Type': 'application/json',
+    //         },
+    //         body: JSON.stringify(payload),
+    //     });
+
+    //     if (response.ok) {
+    //         const result = await response.json();
+    //         console.log('Agendamento salvo com sucesso:', result);
+    //         alert('Agendamento salvo com sucesso!');
+    //     } else {
+    //         throw new Error('Erro ao salvar o agendamento.');
+    //     }
+    // } catch (error) {
+    //     console.error('Erro:', error);
+    //     alert('Houve um problema ao salvar o agendamento.');
+    // }
+}
+
+// Adiciona o evento de clique ao botão "Salvar"
+document.getElementById('salvar-btn').addEventListener('click', salvarAgendamento);
+
+
+  });
+
+
+
+</script>
+
+{% endblock %}
 {% endblock %}

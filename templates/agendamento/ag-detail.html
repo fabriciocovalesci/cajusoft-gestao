@@ -1,0 +1,349 @@
+{% extends 'base.html' %}
+{% load static %}
+
+<style>
+    #calendar .datepicker {
+        width: 100%;
+        padding: 10px;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        background: #fff;
+    }
+
+    .datepicker-days table {
+        width: 100%;
+    }
+
+    .datepicker table tr td {
+        padding: 10px;
+        text-align: center;
+        font-size: 16px;
+    }
+
+    .datepicker table tr td.today {
+        background-color: #0d6efd !important;
+        color: white;
+        border-radius: 50%;
+    }
+
+    .datepicker table tr td.active {
+        background-color: #198754 !important;
+        color: white;
+        border-radius: 50%;
+    }
+
+    .datepicker table tr td:hover {
+        background-color: #e3f2fd;
+        cursor: pointer;
+    }
+</style>
+
+
+{% block content %}
+
+    <div class="card-body">
+        <div class="row mb-4">
+            <div class="col-md-5">
+                <p class="text-muted">Você receberá a confirmação do agendamento através do WhatsApp.</p>
+
+                <div class="instituto-info mb-4">
+                    {% if "Prioritária" in agendamentos.atributo %}
+                        <h5 class="text-primary fw-bold">{{ agendamentos.atributo }}</h5>
+                        <p class="text-muted">Exclusivo para Idosos, Obesos, Gestantes, Deficientes, Lactantes, Pessoas com crianças de colo e doadores de sangue.</p>
+                        <p class="text-muted small">(Comprovar a partir de documentos e/ou laudos o motivo de sua prioridade).</p>
+                        
+                    {% elif "Reservista" in agendamentos.atributo %}
+                        <h5 class="text-primary fw-bold">{{ agendamentos.atributo }}</h5>
+                        <p class="text-muted">Atestado de Reservista.</p>
+                        
+                    {% elif "Prioritária" not in agendamentos.atributo %}
+                        <h5 class="text-primary fw-bold">{{ agendamentos.atributo }}</h5>
+                        <p class="text-muted">Emissão de RG, Segunda via de RG</p>
+                        
+                    {% else %}
+                        <h5 class="text-primary fw-bold">{{ agendamentos.servico }}</h5>
+                        <p class="text-muted">Programas Sociais do Governo Federal.</p>
+                        <p class="text-muted small">Traga documentos de identificação de todos os membros da família.</p>
+                    {% endif %}
+                </div>
+                
+
+                <!-- Documentos necessários -->
+                <div class="documentos-info mb-4 container">
+                    <!-- <h5>DOCUMENTOS A SE LEVAR NO DIA:</h5>
+                    <ul class="list-unstyled small text-muted">
+                        <li>- Certidão de Nascimento ou Casamento;</li>
+                        <li>- Em caso de Divórcio: Averbação de Divórcio;</li>
+                        <li>- Em caso de viuvez: Certidão de Casamento contendo o Óbito na mesma;</li>
+                    </ul> -->
+
+
+                    {% if "Prioritária" in agendamentos.atributo %}
+                    <h5 class="text-muted">Documentos a se lever do dia:</h5>
+                    <ul class="list-group small text-muted mt-3">
+                        <li class="border-0"> Certidão de Nascimento ou Casamento;</li>
+                        <li class="border-0"> Em caso de Divórcio: Averbação de Divórcio;</li>
+                        <li class="border-0"> Em caso de viuvez: Certidão de Casamento contendo o Óbito na mesma;</li>
+                        <li class="border-0"> CPF;</li>
+                        <li class="border-0"> Comprovante de endereço;</li>
+                    </ul>
+                    <br>
+                    <div class="documentos-info mb-4">
+                        <p class="text-muted">
+                            MENOR DE 16 ANOS, ACOMPANHADOS DE RESPONSÁVEL COM RG E COMPROVANTE DE ENDEREÇO.
+                        </p>
+                    </div>
+                    
+                {% elif "Reservista" in agendamentos.atributo %}
+                    <!-- <h4>{{ agendamentos.atributo }}</h4>
+                    <p class="text-muted">Atestado de Reservista.</p> -->
+                    
+                {% elif "Prioritária" not in agendamentos.atributo %}
+                <h5 class="text-muted">DOCUMENTOS A SE LEVAR NO DIA:</h5>
+                <ul class="list-group small text-muted mt-3">
+                    <li class="border-0"> Certidão de Nascimento ou Casamento;</li>
+                    <li class="border-0"> Em caso de Divórcio: Averbação de Divórcio;</li>
+                    <li class="border-0"> Em caso de viuvez: Certidão de Casamento contendo o Óbito na mesma;</li>
+                    <li class="border-0"> CPF;</li>
+                    <li class="border-0"> Comprovante de endereço;</li>
+                </ul>
+                <br>
+                <div class="documentos-info mb-4">
+                    <p class="text-muted">
+                        MENOR DE 16 ANOS, ACOMPANHADOS DE RESPONSÁVEL COM RG E COMPROVANTE DE ENDEREÇO.
+                    </p>
+                </div>
+                
+                {% else %}
+                    <h5 class="text-muted">Principais servicos</h5>
+                    <ul class="list-group small text-muted mt-3">
+                        <li class="border-0"> Adição de membro familiar</li>
+                        <li class="border-0"> Inclusão de membro familiar</li>
+                        <li class="border-0"> Exlusão de membro familiar</li>
+                    </ul>
+                {% endif %}
+
+
+
+                </div>
+
+            </div>
+
+
+            <div class="col-md-7">
+                <div class="calendario-container text-center">
+                    <h5 class="text-center mb-3">Selecione uma data e horário</h5>
+                    <div class="d-flex justify-content-center">
+                        <div id="calendar"></div>
+                    </div>
+
+
+                    <div class="mt-4">
+                    <div class="row mt-3" id="horarios-container"></div>
+
+                    {% if agenda.agendado %}
+                        <p class="text-info mt-2">Você já possui um agendamento confirmado.</p>
+                    {% else %}
+                        <button id="salvar-btn" class="btn btn-primary mt-3">Agendar</button>
+                    {% endif %}
+                </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Sucesso -->
+<div class="modal fade" id="modalSucesso" tabindex="-1" aria-labelledby="modalSucessoLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered"> 
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalSucessoLabel">Agendamento Confirmado</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Seu agendamento foi realizado com sucesso!</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="btnFecharModal" data-bs-dismiss="modal">Fechar</button>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+{% block extra_js %}
+
+
+<script>
+
+    let horaSelecionada = null;
+    let dataSelecionada = "";
+    let isLoggedIn = '{{ user.is_authenticated }}' === 'True';
+    let agendamento = {
+        "id": "{{ agendamentos.id }}",
+        "servico_id": "{{ agendamentos.servico.id }}",
+        "servico": "{{ agendamentos.servico.nome }}",
+        "data_agendamento": "",
+        "horario": "",
+        "slug": "{{ agendamentos.slug }}"
+    }
+
+    async function fetchAgendamentosDaSemana() {
+        try {
+            const response = await fetch(`api/agendamentos-da-semana/`);
+            return await response.json();
+        } catch (error) {
+            console.error('Erro ao buscar agendamentos da semana:', error);
+            return [];
+        }
+    }
+
+    async function fetchAgendamentosPorData(data) {
+        try {
+            const response = await fetch(`api/agendamentos/${data}/`);
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            const agendamentos = await response.json();
+            return agendamentos;
+        } catch (error) {
+            console.error('Erro ao buscar agendamentos por data:', error);
+            return [];
+        }
+    }
+
+        async function salvarAgendamento() {
+            const response = await fetch('/agendamentos/api/new/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    // 'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                },
+                body: JSON.stringify(agendamento)
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Agendamento salvo com sucesso:', data);
+                })
+                .catch(error => {
+                    console.error('Erro ao salvar o agendamento:', error);
+                });
+            return response
+        }
+
+
+    function exibirHorarios(agendamentos) {
+        const $container = $("#horarios-container");
+        $container.empty();
+        if (agendamentos.length === 0) {
+            $container.append("<p class='text-center text-muted'>Nenhum agendamento disponível para esta data.</p>");
+            return;
+        }
+
+        agendamentos.forEach(agendamento => {
+            const $dataDiv = $("<div class='col-12 mb-2'></div>");
+
+            const $dataTitulo = $("<h5 class='text-center mb-3'></h5>").text(`Horários para ${formatarData(agendamento.data)}`);
+            $dataDiv.append($dataTitulo);
+
+            const $btnGroup = $("<div class='d-flex flex-wrap justify-content-center gap-2'></div>");
+
+            agendamento.horarios_disponiveis.forEach(horario => {
+                if (horario.status) {
+                    const $btn = $("<button class='btn btn-outline-primary'></button>")
+                        .text(horario.hora_agenda)
+                        .data("hora", horario.hora_agenda);
+
+                    $btn.on("click", function () {
+                        $(".btn-selecionado").removeClass("btn-info btn-selecionado").addClass("btn-outline-primary");
+                        $(this).removeClass("btn-outline-primary").addClass("btn-info btn-selecionado");
+
+                        console.log("Horário selecionado:", $(this).data("hora"));
+                    });
+
+                    $btnGroup.append($btn);
+                }
+            });
+
+            $dataDiv.append($btnGroup);
+            $container.append($dataDiv);
+        });
+    }
+
+    function formatarData(data) {
+        const [ano, mes, dia] = data.split("-");
+        return `${dia}/${mes}/${ano}`;
+    }
+
+
+
+    $(document).ready(function () {
+        console.log("Iniciando Bootstrap Datepicker...");
+
+        $("#calendar").datepicker({
+            format: "dd/mm/yyyy",
+            todayHighlight: true,
+            autoclose: true,
+            clearBtn: false,
+            language: "pt-BR",
+            weekStart: 0,
+            templates: {
+                leftArrow: '←',
+                rightArrow: '→'
+            }
+        }).on("changeDate", async function (e) {
+            dataSelecionada = e.format("yyyy-mm-dd");
+            $("#data-selecionada").text("Data Selecionada: " + e.format("dd/mm/yyyy"));
+            const agendamentos = await fetchAgendamentosPorData(dataSelecionada);
+            exibirHorarios(agendamentos);
+        });
+    });
+
+
+    $(document).ready(function () {
+        fetchAgendamentosDaSemana().then(agendamentos => {
+            console.log("Agendamentos da semana:", agendamentos);
+            exibirHorarios(agendamentos);
+        });
+
+        $("#salvar-btn").on("click", async function () {
+            if (!dataSelecionada) {
+                const today = new Date();
+                dataSelecionada = today.toISOString().split('T')[0];
+            }
+            agendamento.horario = $(".btn-selecionado").text()
+            agendamento.data_agendamento  = dataSelecionada
+
+
+            if (isLoggedIn && dataSelecionada && $(".btn-selecionado").length > 0) {
+              
+               await salvarAgendamento();
+                $('#modalSucesso').modal('show');
+                localStorage.removeItem('agendamentoData');
+            } else {
+                localStorage.setItem('agendamentoData', JSON.stringify(agendamento));
+                window.location.href = '/accounts/login/';
+            }
+        });
+
+
+
+    });
+
+    $(document).ready(function() {
+        $('#btnFecharModal').on('click', function() {
+            setTimeout(function() {
+                window.location.href = window.location.origin + '/agendar/';
+            }, 600);
+        });
+    });
+
+
+
+</script>
+{% endblock %}
+{% endblock %}

@@ -23,6 +23,8 @@ urlpatterns = [
     path("accounts/", include("accounts.urls")),
     path('admin/', admin.site.urls),
     path('', include('servicos.urls')),
+    path('agendamentos/', include('agendamento.urls')),
+    path('webhooks/', include('webhooks.urls')),
 ]
 
 if settings.DEBUG:

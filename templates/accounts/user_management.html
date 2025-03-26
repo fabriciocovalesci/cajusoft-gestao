@@ -3,7 +3,9 @@
 
 {% block content %}
 <div class="container mt-4">
-    <h2 class="mb-4 text-primary fw-bold">Gerenciamento de Usuários</h2>
+      <h4 class="text-primary fw-bold">
+        <i class="bi btn-info me-2"></i>Gerenciamento de Usuários
+    </h4>
     
     {% if messages %}
     <div class="messages">
@@ -17,10 +19,11 @@
 
     <!-- Add New User Button -->
     <div class="mb-4">
-        <button type="button" class="btn btn-primary rounded-pill shadow-sm" data-bs-toggle="modal" data-bs-target="#addUserModal" style="transition: all 0.3s ease-in-out; background-color: #4361ee;">
+        <button type="button" class="btn btn-primary rounded-pill shadow-sm btn-sm" data-bs-toggle="modal" data-bs-target="#addUserModal" style="transition: all 0.3s ease-in-out; background-color: #4361ee;">
             <i class="fas fa-user-plus me-2"></i> Adicionar Novo Usuário
         </button>
     </div>
+    
 
     <!-- Add User Modal -->
     <div class="modal fade" id="addUserModal" tabindex="-1" aria-labelledby="addUserModalLabel" aria-hidden="true">
@@ -57,7 +60,7 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="submit" class="btn btn-primary">Adicionar</button>
+                        <button type="submit" class="btn btn-primary btn-sm">Adicionar</button>
                     </div>
                 </form>
             </div>

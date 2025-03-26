@@ -1,104 +1,255 @@
 {% extends 'base.html' %}
+{% load static %}
 {% load user_tags %}
 
-{% block content %}
-<div class="container py-4">
-   
-    <div class="d-flex justify-content-between align-items-center mb-4 p-3 bg-light rounded">
-        <h3 class="section-title m-0 text-primary">Agendamentos Disponíveis</h3>
-        {% if user|has_role:'admin,secretary,interviewer' %}
-        <a href="{% url 'agendamento_create' %}" class="btn btn-primary position-relative d-flex align-items-center">
-            <i class="bi bi-plus-circle me-2"></i>
-            <span>Criar Agendamento</span>
-        </a>
-        {% endif %}
-    </div>
+{% block title %}Agendamentos{% endblock %}
 
-    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mb-5">
+{% block content %}
+<div class="container mt-4">
+    <h3 class="mb-4 text-primary">Agendamento no Município de Pacajus-CE</h3>
+
+
+    <p class="mb-4">
+        Agenda para a realização de Emissão de RG, Segunda via de RG, Certificado de Reservista e Atestado de
+        Desobrigado.
+    </p>
+    
+
+    <p class="mb-4">
+        <strong>OBS: EM QUALQUER DOS CASOS, COMPARECER COM BLUSA DE MANGA, VALORES DE TAXAS E DOCUMENTOS NECESSÁRIOS A
+            CONSULTAR.
+            CASO NÃO COMPARECER NO AGENDAMENTO, SERÁ IMPOSSIBILITADO DE AGENDAR POR 30 DIAS, PARA EVITAR, CANCELE 24
+            HORAS ANTES DA REALIZAÇÃO DO AGENDAMENTO.</strong>
+    </p>
+
+    <div class="row">
+        <!-- Card 1: Emissão Prioritária de RG -->
+
+
+        {% if agendamentos %}
         {% for agendamento in agendamentos %}
-        <div class="col">
-            <div class="card h-100 shadow-sm appointment-card">
+
+        {% if agendamento.prioritario == True %}
+        <div class="col-md-6 col-lg-3 mb-4">
+            <div class="card h-100 shadow">
                 <div class="card-body">
-                    <h5 class="card-title">{{ agendamento.servico }}</h5>
-                    <div class="appointment-info mb-3">
-                        <p class="card-text mb-2"><i class="bi bi-calendar me-2"></i>{{ agendamento.data }}</p>
-                        <p class="card-text mb-2"><i class="bi bi-people me-2"></i>Vagas: {{ agendamento.vagas }}</p>
-                        <p class="card-text mb-2"><i class="bi bi-clock me-2"></i>{{ agendamento.hora_inicio }} - {{ agendamento.hora_fim }}</p>
-                        <p class="card-text"><i class="bi bi-info-circle me-2"></i>Status: {{ agendamento.get_status_display }}</p>
+                    <h5 class="card-title">Emissão Prioritária do RG (Primeira e Segunda Via)</h5>
+                    <br>
+                    <p class="card-text">
+                        Exclusivo para Idosos, Obesos, Gestantes, Deficientes, Lactantes, Pessoas com crianças de colo e
+                        doadores de sangue.
+                    </p>
+
+                    <div class="mt-3">
+                        <div class="d-flex align-items-center mb-2">
+                            <i class="bi bi-calendar-event me-2"></i>
+                            <span>{{ agendamento.vagas }} Sessão</span>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-clock me-2"></i>
+                            <span>0h {{ agendamento.intervalo }}m Duração</span>
+                        </div>
                     </div>
-                    {% if user|has_role:'admin,secretary,interviewer' %}
-                    <div class="d-flex justify-content-end mt-3">
-                        <a href="{% url 'agendamento_detail' agendamento.id %}" class="btn btn-outline-primary btn-sm me-2">
-                            <i class="bi bi-eye me-1"></i>Ver
-                        </a>
-                        <!-- <a href="{% url 'agendamento_update' agendamento.id %}" class="btn btn-outline-secondary btn-sm me-2">
-                            <i class="bi bi-pencil me-1"></i>Editar
-                        </a> -->
-                        <a href="{% url 'agendamento_delete' agendamento.id %}" class="btn btn-outline-danger btn-sm">
-                            <i class="bi bi-trash me-1"></i>Deletar
-                        </a>
-                    </div>
-                    {% endif %}
-                    {% if user|has_role:'client' %}
-                    <div class="d-flex mt-3">
-                        <a href="{% url 'agendar_create_with_id' agendamento.id %}" class="btn btn-primary w-100">
-                            <i class="bi bi-calendar-plus me-2"></i>Agendar
-                        </a>
-                    </div>
-                    {% endif %}
+                </div>
+                <div class="card-footer bg-white border-top-0 text-end">
+                    <a href="{% url 'agendamento:agendamento_detail' slug=agendamento.slug %}"
+                        class="btn btn-primary btn-sm px-2 py-1">
+                        Ver Detalhes
+                    </a>
                 </div>
             </div>
         </div>
-        {% empty %}
-        <div class="col-12">
-            <div class="alert alert-info" role="alert">
-                Nenhum agendamento disponível ainda.
-                {% if user|has_role:'admin,secretary,interviewer' %}
-                    Clique em "Criar Agendamento" para começar!
-                {% endif %}
+        {% endif %}
+        {% if agendamento.atributo_slug == "emissao-de-rg-primeira-e-segunda-via" %}
+
+        <!-- Card 2: Emissão de RG -->
+        <div class="col-md-6 col-lg-3 mb-4">
+            <div class="card h-100 shadow">
+                <div class="card-body">
+                    <h5 class="card-title">Emissão do RG (Primeira e Segunda Via)</h5>
+
+                    <br>
+
+                    <p class="card-text">
+                        DOCUMENTOS A SE LEVAR NO DIA: Certidão de Nacimento ou Casamento, em caso de Divórcio: Averbação
+                        de Divórcio.
+                    </p>
+
+                    <div class="mt-3">
+                        <div class="d-flex align-items-center mb-2">
+                            <i class="bi bi-calendar-event me-2"></i>
+                            <span>{{ agendamento.vagas }} Sessão</span>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-clock me-2"></i>
+                            <span>0h {{ agendamento.intervalo }}m Duração</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-white border-top-0 text-end">
+                    <a href="{% url 'agendamento:agendamento_detail' slug=agendamento.slug %}"
+                        class="btn btn-primary btn-sm px-2 py-1">
+                        Ver Detalhes
+                    </a>
+                </div>
             </div>
         </div>
+        {% endif %}
+        {% if agendamento.atributo_slug == "emissao-do-certificado-de-reservista" %}
+        <!-- Card 3: Emissão do Certificado de Reservista -->
+        <div class="col-md-6 col-lg-3 mb-4">
+            <div class="card h-100 shadow">
+                <div class="card-body">
+                    <h5 class="card-title">Emissão do Certificado de Reservista</h5>
+                    <br>
+                    <p class="card-text">
+                        ATESTADO DE DESOBRIGADO (ACIMA DE 46 ANOS OU NO ANO QUE COMPLETA 46 ANOS) e RESERVISTA:
+                        DOCUMENTOS A SE LEVAR...
+                    </p>
+
+                    <div class="mt-3">
+                        <div class="d-flex align-items-center mb-2">
+                            <i class="bi bi-calendar-event me-2"></i>
+                            <span>{{ agendamento.vagas }} Sessão</span>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-clock me-2"></i>
+                            <span>0h {{ agendamento.intervalo }}m Duração</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-white border-top-0 text-end">
+                    <a href="{% url 'agendamento:agendamento_detail' slug=agendamento.slug %}"
+                        class="btn btn-primary btn-sm px-2 py-1">
+                        Ver Detalhes
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        {% endif %}
+
+        {% if agendamento.atributo_slug == "none" %}
+        <!-- Card 4: Cadastro Único -->
+        <div class="col-md-6 col-lg-3 mb-4">
+            <div class="card h-100 shadow">
+                <div class="card-body">
+                    <h5 class="card-title">Cadastro Único</h5>
+
+                    <br>
+                    <p class="card-text">
+                        Cadastro Único para Programas Sociais do Governo Federal. Traga documentos de identificação de
+                        todos os membros da família.
+                    </p>
+
+                    <div class="mt-3">
+                        <div class="d-flex align-items-center mb-2">
+                            <i class="bi bi-calendar-event me-2"></i>
+                            <span>{{ agendamento.vagas }} Sessão</span>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-clock me-2"></i>
+                            <span>0h {{ agendamento.intervalo }}m Duração</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-white border-top-0 text-end">
+                    <a href="{% url 'agendamento:agendamento_detail' slug=agendamento.slug %}"
+                        class="btn btn-primary btn-sm px-2 py-1">
+                        Ver Detalhes
+                    </a>
+                </div>
+
+            </div>
+        </div>
+        {% endif %}
+
+
+
         {% endfor %}
+        {% endif %}
+
     </div>
 </div>
 
-<style>
-.section-title {
-    font-size: 2.5rem;
-    font-weight: 600;
-    color: #2c3e50;
-    margin-bottom: 1rem;
-    position: relative;
-    display: inline-block;
-}
-
-.appointment-card {
-    transition: transform 0.2s ease;
-    border: 1px solid rgba(0,0,0,0.125);
-}
-
-.appointment-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-}
-
-.appointment-info {
-    color: #6c757d;
-}
-
-.btn-primary {
-    transition: all 0.2s ease;
-    background-color: #0d6efd;
-    border-color: #0d6efd;
-}
-
-.btn-primary:hover {
-    background-color: #0b5ed7;
-    border-color: #0a58ca;
-    transform: translateY(-1px);
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
+<!-- Modal de Sucesso -->
+<div class="modal fade" id="modalSucesso" tabindex="-1" aria-labelledby="modalSucessoLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered"> <!-- Centraliza o modal na tela -->
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalSucessoLabel">Agendamento Confirmado</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <!-- Botão de fechar moderno -->
+            </div>
+            <div class="modal-body">
+                <p>Seu agendamento foi realizado com sucesso!</p> <!-- Usando uma tag <p> para melhor formatação -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                <!-- Botão para fechar o modal -->
+            </div>
+        </div>
+    </div>
+</div>
 
 
-</style>
+
+{% block extra_js %}
+<script>
+
+
+    async function salvarAgendamento() {
+        const response = await fetch('/agendamentos/api/new/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                // 'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            },
+            body: JSON.stringify(agendamento)
+        })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Agendamento salvo com sucesso:', data);
+            })
+            .catch(error => {
+                console.error('Erro ao salvar o agendamento:', error);
+            });
+        return response
+    }
+
+    document.addEventListener("DOMContentLoaded", async function () {
+        const agendamentoData = localStorage.getItem("agendamentoData");
+
+        if (agendamentoData) {
+            console.log("Agendamento encontrado no localStorage:", agendamentoData);
+
+            try {
+                const response = await fetch('/agendamentos/api/new/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: agendamentoData
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log("Agendamento salvo com sucesso:", data);
+
+
+                    $('#modalSucesso').modal('show');
+
+                    localStorage.removeItem("agendamentoData");
+                } else {
+                    console.error("Erro ao salvar o agendamento:", response.status);
+                }
+            } catch (error) {
+                console.error("Erro ao salvar o agendamento:", error);
+            }
+        }
+    });
+
+</script>
+
+{% endblock %}
 {% endblock %}

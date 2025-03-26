@@ -12,15 +12,16 @@ User._meta.get_field('email')._unique = True
 class UserProfile(models.Model):
     ROLE_CHOICES = [
         ('admin', 'Admin'),
-        ('secretary', 'Secretary'),
-        ('interviewer', 'Interviewer'),
-        ('client', 'Client'),
+        ('secretary', 'Secretario'),
+        ('interviewer', 'Entrevistador'),
+        ('client', 'Cliente'),
     ]
 
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='client')
-    phone = models.CharField(_('Telefone'), max_length=15, blank=True, null=True)
-    cpf = models.CharField(_('CPF'), max_length=11, unique=True, blank=True, null=True)
+    phone_person = models.CharField(_('Telefone Pessoal'), max_length=15)
+    phone_contact = models.CharField(_('Telefone Contato'), max_length=15, blank=True, null=True)
+    cpf = models.CharField(_('CPF'), max_length=11, unique=True)
     avatar = models.ImageField(_('Avatar'), upload_to='avatars/', blank=True, null=True)
     created_at = models.DateTimeField(_('Criado em'), auto_now_add=True)
     updated_at = models.DateTimeField(_('Atualizado em'), auto_now=True)

@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load user_tags %}
+
+{% block title %}Agendamentos{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h3 class="mb-4 text-primary">Agendamento no Município de Pacajus-CE</h3>
+
+    {% if user|has_role:'admin,secretary,interviewer' %}
+    <div class="mb-3 text-end">
+        <a href="{% url 'agendamento:agendamento_create' %}" class="btn btn-primary">
+            Agendar <i class="bi bi-plus-circle"></i>
+        </a>
+    </div>
+    {% endif %}
+    
+    <div class="table-responsive">
+        <table class="table table-striped table-hover">
+            <thead class="table-light">
+                <tr>
+                    <th>Atributo</th>
+                    <th>Nome do Serviço</th> 
+                    <th>Data</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for agendamento in agendamentos %}
+                <tr>
+                    <td>{{ agendamento.atributo }}</td>
+                    <td>{{ agendamento.servico.nome }}</td> 
+                    <td>{{ agendamento.data }}</td>
+                    <td>
+                        <a href="{% url 'agendamento:agendamento_detail' slug=agendamento.slug %}" class="btn btn-info btn-sm">Ver Detalhes</a>
+                        <a href="{% url 'agendamento:agendamento_update' slug=agendamento.slug %}" class="btn btn-warning btn-sm">Editar</a>
+                        <a href="{% url 'agendamento:agendamento_delete' slug=agendamento.slug %}" class="btn btn-danger btn-sm">Deletar</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="text-center">Nenhum agendamento encontrado.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+    // JavaScript personalizado (se necessário)
+</script>
+{% endblock %}
+{% endblock %}
